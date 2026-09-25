@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import vhLogo from '../assets/vh-logo-metal.jpg'
-import catalogNike01 from '../assets/catalog/nike-01-hi.jpg'
-import catalogNike02 from '../assets/catalog/nike-02-hi.jpg'
-import catalogNike03 from '../assets/catalog/nike-03-hi.jpg'
-import catalogNike04 from '../assets/catalog/nike-04-hi.jpg'
+import catalogNike01 from '../assets/catalog_nike-01-hi.jpg'
+import catalogNike02 from '../assets/catalog_nike-02-hi.jpg'
+import catalogNike03 from '../assets/catalog_nike-03-hi.jpg'
+import catalogNike04 from '../assets/catalog_nike-04-hi.jpg'
 
 const WHATSAPP_NUMBER = '5562982593182'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
