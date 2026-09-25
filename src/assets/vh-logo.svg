@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 180" role="img" aria-labelledby="title desc">
+  <title id="title">VH Imports</title>
+  <desc id="desc">Logotipo tipográfico da VH Imports</desc>
+  <rect width="520" height="180" rx="24" fill="#111111"/>
+  <path d="M58 43h28l23 67 24-67h28l-36 94h-32L58 43Zm120 0h27v94h-27V43Zm53 0h26l25 43 25-43h26v94h-26V82l-25 42-25-42v55h-26V43Zm145 0h28v94h-28V43Z" fill="#fff"/>
+  <path d="M58 148h318" stroke="#37d67a" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="404" cy="151" r="8" fill="#37d67a"/>
+</svg>
