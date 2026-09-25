@@ -1,44 +1,39 @@
 # VH Imports
 
-Sistema online da VH Imports, loja de tênis importados.
+Sistema interno da VH Imports, loja de tênis importados, construído com o mesmo fluxo operacional do sistema Finesse.
 
-## Status atual
+## Módulos implementados
 
-Esta primeira versão é um protótipo navegável e estático, preparado para evoluir para o sistema completo da operação da loja.
+- autenticação por e-mail e senha com dois usuários master;
+- dashboard com vendas, estoque, cobranças e metas;
+- pedidos manuais, status, pagamentos e parcelamentos;
+- clientes, aniversários e campanhas de reativação;
+- produtos, marcas, categorias, imagens WebP e estoque;
+- lucro estimado e financeiro contínuo;
+- calendário de conteúdo para Instagram;
+- auditoria e regras transacionais no Supabase;
+- vitrine pública separada do painel interno.
 
-- `index.html`: entrada principal na raiz, compatível com GitHub Pages.
-- `dist/index.html`: cópia de distribuição usada na prévia local e no Site atual.
-- `docs/SISTEMA.md`: escopo, regras de negócio e roadmap.
-- `VH_IMPORTS_HANDOFF.md`: contexto completo para continuidade em outro chat.
+## Rodando localmente
 
-## Como visualizar localmente
+1. Instale Node.js 20+.
+2. Execute `npm install`.
+3. Copie `.env.example` para `.env.local`.
+4. Informe somente a URL e a chave publicável do projeto VH Imports no Supabase.
+5. Execute `npm run dev`.
 
-Na pasta do projeto, execute:
+Nunca coloque `service_role`, chaves secretas ou dados reais no frontend ou no GitHub.
 
-```bash
-python -m http.server 4173
-```
+## Banco de dados
 
-Depois acesse `http://127.0.0.1:4173/`.
+As migrations em `supabase/migrations` devem ser aplicadas em ordem no projeto Supabase da VH Imports. Depois execute `supabase/seed.sql`.
 
-## Fluxos disponíveis no protótipo
+A migration `20260925000900_vh_imports_catalog.sql` adiciona marcas, categorias de tênis e grade de numerações sem remover as regras transacionais da Finesse.
 
-- Vitrine da loja;
-- catálogo por marca e categoria;
-- busca e ordenação;
-- favoritos;
-- carrinho demonstrativo;
-- seleção de numeração;
-- entrada visual no painel da loja;
-- login demonstrativo sem validação de credenciais;
-- painel inicial com indicadores e pedidos recentes.
+## Publicação
 
-## Publicação no GitHub
+O `index.html` compilado é copiado para a raiz pelo build, permitindo publicar a branch `main` pela raiz no GitHub Pages.
 
-O projeto foi preparado com `index.html` na raiz para leitura pelo GitHub Pages. O destino informado foi a organização `https://github.com/vhimports`.
+## Documentação
 
-Para concluir o push, é necessário informar ou conectar um repositório específico dentro dessa organização, por exemplo `vhimports/site` ou `vhimports/sistema`.
-
-## Observação
-
-Os produtos, preços e imagens atualmente cadastrados são dados de demonstração. A próxima etapa é importar as imagens reais do catálogo, converter para WebP e cadastrar estoque por tamanho.
+Consulte [docs/SISTEMA.md](docs/SISTEMA.md) antes de alterar regras do produto ou do banco.
