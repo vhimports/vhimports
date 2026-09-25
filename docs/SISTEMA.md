@@ -75,10 +75,10 @@ Atualização visual de 25/09/2026:
 - A vitrine pública passou a usar o preto como tema principal, com superfícies escuras, texto claro e contraste alto para destacar os produtos.
 - O efeito de tipografia em grafite foi removido. Os títulos e palavras de ênfase usam a família condensada `Anton`, sem a fonte dripping/graffiti.
 - Quatro fotos reais da pasta compartilhada do catálogo foram incorporadas ao projeto como arquivos locais de alta resolução:
-  - `src/assets/catalog/nike-01-hi.jpg`
-  - `src/assets/catalog/nike-02-hi.jpg`
-  - `src/assets/catalog/nike-03-hi.jpg`
-  - `src/assets/catalog/nike-04-hi.jpg`
+  - `src/assets/catalog_nike-01-hi.jpg`
+  - `src/assets/catalog_nike-02-hi.jpg`
+  - `src/assets/catalog_nike-03-hi.jpg`
+  - `src/assets/catalog_nike-04-hi.jpg`
 - As imagens originais têm aproximadamente 1.200 × 1.600 px e são usadas no destaque principal, no primeiro card de produto e na galeria da comunidade.
 - As imagens ficam empacotadas pelo Vite em `dist/assets` durante o build; o site não depende de URLs privadas do Google Drive para renderizar essa seleção inicial.
 
