@@ -67,3 +67,19 @@ Aplicar, em ordem:
 ## Estado desta versão
 
 O frontend contém a estrutura operacional migrada da Finesse e a identidade da VH Imports. A conexão real depende de criar o projeto Supabase da VH Imports, aplicar as migrations e preencher as variáveis públicas em `.env.local`.
+
+## Vitrine pública — tema preto e fotos do catálogo
+
+Atualização visual de 25/09/2026:
+
+- A vitrine pública passou a usar o preto como tema principal, com superfícies escuras, texto claro e contraste alto para destacar os produtos.
+- O efeito de tipografia em grafite foi removido. Os títulos e palavras de ênfase usam a família condensada `Anton`, sem a fonte dripping/graffiti.
+- Quatro fotos reais da pasta compartilhada do catálogo foram incorporadas ao projeto como arquivos locais de alta resolução:
+  - `src/assets/catalog/nike-01-hi.jpg`
+  - `src/assets/catalog/nike-02-hi.jpg`
+  - `src/assets/catalog/nike-03-hi.jpg`
+  - `src/assets/catalog/nike-04-hi.jpg`
+- As imagens originais têm aproximadamente 1.200 × 1.600 px e são usadas no destaque principal, no primeiro card de produto e na galeria da comunidade.
+- As imagens ficam empacotadas pelo Vite em `dist/assets` durante o build; o site não depende de URLs privadas do Google Drive para renderizar essa seleção inicial.
+
+Validação realizada com `npm run build` e prévia local em `http://127.0.0.1:4173/?catalog=hi-res`.
