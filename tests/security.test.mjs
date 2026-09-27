@@ -260,7 +260,7 @@ test('due date correction audits reason, changes only one installment and denies
 }));
 test('dashboard includes every paid transaction, excludes pending/canceled and refreshes canonical names',()=>tx(async()=>{
   await asUser(); const {o,c,installments}=await linkedOrder();
-  await db.query("select public.record_installment_payment($1,10,'pix',$2,gen_random_uuid(),now()-interval '1 minute')",[installments[0].id,account]);
+  await db.query("select public.record_installment_payment($1,10,'pix',$2,gen_random_uuid(),(((now() at time zone 'America/Sao_Paulo')::date + time '12:00') at time zone 'America/Sao_Paulo'))",[installments[0].id,account]);
   await db.exec('reset role');
   await db.query('update public.contas_financeiras set initial_balance=50 where id=$1',[account]);
   await db.query("insert into public.transacoes_financeiras(financial_account_id,type,direction,status,amount,description,transaction_date) select $1,'income','in','paid',1,'Teste agregado',(now() at time zone 'America/Sao_Paulo')::date from generate_series(1,1100)",[account]);

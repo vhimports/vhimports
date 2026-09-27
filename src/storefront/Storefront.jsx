@@ -3,7 +3,8 @@ import vhLogo from '../assets/vh-logo-metal.jpg'
 import { vhCatalogAssets } from '../lib/vhCatalogAssets'
 
 const WHATSAPP_NUMBER = '5562982593182'
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const defaultSupabaseUrl = 'https://zbmxehzprydojjfdwupp.supabase.co'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || defaultSupabaseUrl
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 const brandTones = ['sand', 'stone', 'mist', 'clay', 'olive', 'blue']
@@ -48,9 +49,11 @@ export default function Storefront() {
     let alive = true
     async function loadCatalog() {
       setLoading(true)
-      if (!supabaseUrl || !supabaseAnonKey) { setCatalogError('Configure a conexão pública do Supabase para carregar o catálogo.'); setLoading(false); return }
+      if (!supabaseUrl) { setCatalogError('Configure a conexão pública do Supabase para carregar o catálogo.'); setLoading(false); return }
       try {
-        const response = await fetch(`${supabaseUrl}/functions/v1/public-catalog`, { headers: { apikey: supabaseAnonKey, Accept: 'application/json' } })
+        const headers = { Accept: 'application/json' }
+        if (supabaseAnonKey) headers.apikey = supabaseAnonKey
+        const response = await fetch(`${supabaseUrl}/functions/v1/public-catalog`, { headers })
         if (!response.ok) throw new Error('Catálogo indisponível')
         const result = await response.json()
         if (alive && Array.isArray(result.products)) {
