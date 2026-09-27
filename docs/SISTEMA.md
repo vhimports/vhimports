@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Replicar o fluxo operacional da Finesse para uma loja de tênis importados, preservando as regras de autenticação, estoque, pedidos, pagamentos, cobranças, financeiro, conteúdo e auditoria.
+Replicar a base segura da Finesse para uma loja de tênis importados, adaptando a regra comercial da VH Imports: o catálogo público não controla estoque e as fotos dos produtos são assets fixos versionados no projeto.
 
 ## Perfis e acesso
 
@@ -12,25 +12,36 @@ Replicar o fluxo operacional da Finesse para uma loja de tênis importados, pres
 - O cadastro público não faz parte do sistema.
 - A autorização final ocorre pelo RLS e pelas funções RPC; alterar apenas o perfil visual não concede acesso.
 
-## Fluxo de pedido
+## Regra comercial atual
+
+- A VH Imports não fará controle de estoque no catálogo.
+- Não haverá baixa, reserva ou ajuste de estoque para publicar produtos na vitrine.
+- As fotos futuras serão incorporadas como assets fixos no código e identificadas no banco por `image_key`.
+- O master acessa o painel para informar preço de venda, preço promocional, ordem, destaque e publicação.
+- Um produto só aparece na vitrine quando estiver ativo e tiver preço de venda maior que zero.
+- Alterações de preço usam a RPC `update_vh_catalog_prices`, são idempotentes e entram na auditoria.
+- A vitrine continua sem checkout; o contato é feito manualmente pelo WhatsApp.
+
+## Fluxo de pedido legado
 
 1. A operação seleciona ou cadastra o cliente.
 2. Seleciona produtos, marca, categoria, numeração e quantidade.
 3. O pedido começa como pendente.
-4. Ao confirmar a venda, `mark_order_sold` valida o estoque e registra as saídas.
-5. Pagamentos entram por `record_order_payment`, com chave idempotente.
-6. Parcelamentos geram acordo e parcelas.
-7. O pedido pode avançar para vendido, enviado, concluído, cancelado ou devolvido.
+4. Pagamentos entram por `record_order_payment`, com chave idempotente.
+5. Parcelamentos geram acordo e parcelas.
+6. O pedido pode avançar para vendido, enviado, concluído, cancelado ou devolvido.
 
-Não existe baixa direta de estoque pela interface; ajustes usam `adjust_stock`.
+Esse fluxo permanece versionado como legado da base Finesse e não é usado pela nova vitrine sem estoque da VH Imports.
 
-## Catálogo e estoque
+## Catálogo fixo e preços
 
-O catálogo é organizado por marca, categoria, modelo/SKU, grade de numeração, preço de custo, preço de venda, preço promocional, imagens privadas e estoque por numeração.
+O catálogo é organizado por modelo, marca, categoria, foto fixa, preço de venda, preço promocional, destaque e ordem de exibição. A tabela `vh_catalogo_produtos` não possui quantidade, reserva, custo ou movimentação de estoque.
 
 As marcas iniciais são Nike, Adidas, Asics, New Balance, Puma e Olympikus. O cadastro continua aberto para novas marcas.
 
-O bucket `product-images` é privado. O frontend utiliza URLs assinadas e nunca recebe a `service_role`.
+As fotos atuais ficam em `src/assets/` e são associadas ao banco pela coluna `image_key`. Para adicionar uma nova foto, o arquivo deve ser versionado, incluído em `src/lib/vhCatalogAssets.js` e registrado por migration/seed. O painel não faz upload nem exclusão de fotos.
+
+O bucket `product-images` e o modelo antigo de imagens continuam disponíveis para os módulos legados, mas não participam do catálogo fixo da VH Imports.
 
 ## Financeiro e cobranças
 
@@ -49,7 +60,7 @@ O bucket `product-images` é privado. O frontend utiliza URLs assinadas e nunca 
 
 ## Banco e segurança
 
-As migrations criam tabelas em português, enums, views, RLS, funções transacionais e logs de auditoria. As funções sensíveis são a fonte única das regras de estoque, pagamentos e financeiro.
+As migrations criam tabelas em português, enums, views, RLS, funções transacionais e logs de auditoria. No catálogo VH, a função sensível é a fonte única da atualização de preços e publicação; não há regra de estoque.
 
 Aplicar, em ordem:
 
@@ -62,11 +73,12 @@ Aplicar, em ordem:
 7. `20260921000700_weekly_content_scheduler.sql`
 8. `20260921000800_sales_goals.sql`
 9. `20260925000900_vh_imports_catalog.sql`
-10. `supabase/seed.sql`
+10. `20260926001000_vh_fixed_catalog.sql`
+11. `supabase/seed.sql`
 
 ## Estado desta versão
 
-O frontend contém a estrutura operacional migrada da Finesse e a identidade da VH Imports. A conexão real depende de criar o projeto Supabase da VH Imports, aplicar as migrations e preencher as variáveis públicas em `.env.local`.
+O frontend contém a base operacional migrada da Finesse, o catálogo fixo de testes e a identidade da VH Imports. A conexão real depende de aplicar as migrations no projeto Supabase da VH Imports e preencher as variáveis públicas em `.env.local`.
 
 ## Vitrine pública — tema preto e fotos do catálogo
 
@@ -81,5 +93,6 @@ Atualização visual de 25/09/2026:
   - `src/assets/catalog_nike-04-hi.jpg`
 - As imagens originais têm aproximadamente 1.200 × 1.600 px e são usadas no destaque principal, no primeiro card de produto e na galeria da comunidade.
 - As imagens ficam empacotadas pelo Vite em `dist/assets` durante o build; o site não depende de URLs privadas do Google Drive para renderizar essa seleção inicial.
+- O preço e o estado de publicação não ficam duplicados no código: o painel grava esses dados em `vh_catalogo_produtos`, e a vitrine consulta a Edge Function `public-catalog`.
 
 Validação realizada com `npm run build` e prévia local em `http://127.0.0.1:4173/?catalog=hi-res`.

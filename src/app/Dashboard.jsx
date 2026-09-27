@@ -21,7 +21,7 @@ const navigation = [
   { id: 'birthdays', label: 'Aniversários', icon: '✦' },
   { id: 'winback', label: 'Reativação', icon: '↻' },
   { id: 'receivables', label: 'Cobranças', icon: '◷' },
-  { id: 'inventory', label: 'Produtos e estoque', icon: '◇' },
+  { id: 'inventory', label: 'Produtos e preços', icon: '◇' },
   { id: 'profit', label: 'Lucro estimado', icon: '↗' },
   { id: 'finance', label: 'Financeiro', icon: '◷' },
   { id: 'content', label: 'Conteúdo', icon: '✦' },
@@ -82,15 +82,16 @@ export function Dashboard({ session }) {
       const currentVersion = ++version
       setLoading(true); setError('')
       try {
-        const [summary, profile, projection, goal] = await Promise.all([
+        const [summary, catalog, profile, projection, goal] = await Promise.all([
           supabase.rpc('dashboard_summary'),
+          supabase.from('vh_catalogo_produtos').select('id', { count: 'exact', head: true }).eq('active', true),
           supabase.from('perfis').select('full_name').eq('id', session.user.id).maybeSingle(),
           supabase.from('resumo_parcelas_recebiveis').select('due_date,amount,paid_amount,effective_status').in('effective_status', ['pending', 'partially_paid', 'overdue']),
           supabase.rpc('sales_goal_summary'),
         ])
         if (!mounted || currentVersion !== version) return
-        if (summary.error || profile.error || projection.error || goal.error || !summary.data || !goal.data) throw summary.error || profile.error || projection.error || goal.error || new Error('Dados indisponíveis')
-        setMetrics(summary.data)
+        if (summary.error || catalog.error || profile.error || projection.error || goal.error || !summary.data || !goal.data) throw summary.error || catalog.error || profile.error || projection.error || goal.error || new Error('Dados indisponíveis')
+        setMetrics({ ...summary.data, products: catalog.count ?? 0 })
         setProjectionRows(projection.data ?? [])
         setGoalSummary(goal.data)
         if (goal.data.goal) setGoalForm({ start_date: goal.data.goal.start_date, end_date: goal.data.goal.end_date, target_amount: String(goal.data.goal.target_amount) })
@@ -206,7 +207,7 @@ function DashboardHome({ greeting, profileName, metrics, loading, error, setActi
     <section className="metric-grid">
       <MetricCard label="Saldo disponível" value={metrics.balance == null ? '—' : money(metrics.balance)} detail="Contas ativas · somente movimentos pagos" accent="gold" loading={loading} />
       <MetricCard label="A receber" value={metrics.receivables == null ? '—' : money(metrics.receivables)} detail="Saldo restante das parcelas" accent="lavender" loading={loading} />
-      <MetricCard label="Produtos ativos" value={metrics.products == null ? '—' : metrics.products} detail="Produtos cadastrados" accent="blue" loading={loading} />
+      <MetricCard label="Modelos publicados" value={metrics.products == null ? '—' : metrics.products} detail="Catálogo fixo com preço definido" accent="blue" loading={loading} />
       <MetricCard label="Pedidos" value={metrics.orders == null ? '—' : metrics.orders} detail="Pedidos não cancelados" accent="peach" loading={loading} />
     </section>
     <section className="panel projection-panel">
@@ -241,7 +242,7 @@ function DashboardHome({ greeting, profileName, metrics, loading, error, setActi
     </section>
     <section className="dashboard-grid lower-grid"><article className="panel"><div className="panel-heading"><div><span className="eyebrow">Operação</span><h2>Pedidos recentes</h2></div><button className="link-button" onClick={() => setActive('orders')}>Ver pedidos ↗</button></div>
       {available && metrics.recent_orders?.length ? <div className="dashboard-records">{metrics.recent_orders.map((order) => <div className="dashboard-record" key={order.id}><span><strong>Pedido #{order.order_number}</strong><small>{order.customer_name || 'Cliente não informado'}{order.status === 'canceled' ? ' · Cancelado' : ''}</small></span><b>{money(order.total_amount)}</b></div>)}</div> : empty('Nenhum pedido cadastrado.')}
-    </article><article className="panel quick-panel"><div className="panel-heading"><div><span className="eyebrow">Atalhos</span><h2>Ações rápidas</h2></div></div><div className="quick-actions"><button onClick={() => setActive('orders')}><span>＋</span><div><strong>Novo pedido</strong><small>Registrar uma venda manual</small></div><b>↗</b></button><button onClick={() => setActive('receivables')}><span>♧</span><div><strong>Nova cobrança</strong><small>Acompanhar parcelas</small></div><b>↗</b></button><button onClick={() => setActive('inventory')}><span>◇</span><div><strong>Adicionar produto</strong><small>Cadastrar uma peça</small></div><b>↗</b></button></div></article></section>
+    </article><article className="panel quick-panel"><div className="panel-heading"><div><span className="eyebrow">Atalhos</span><h2>Ações rápidas</h2></div></div><div className="quick-actions"><button onClick={() => setActive('orders')}><span>＋</span><div><strong>Novo pedido</strong><small>Registrar uma venda manual</small></div><b>↗</b></button><button onClick={() => setActive('receivables')}><span>♧</span><div><strong>Nova cobrança</strong><small>Acompanhar parcelas</small></div><b>↗</b></button><button onClick={() => setActive('inventory')}><span>◇</span><div><strong>Atualizar preços</strong><small>Publicar modelos na vitrine</small></div><b>↗</b></button></div></article></section>
   </div>
 }
 

@@ -45,53 +45,33 @@ Deno.serve(async (request) => {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    const [productsResult, stockResult, categoriesResult] = await Promise.all([
-      admin.from('produtos')
-        .select('id,name,description,material,purity,sale_price,promotional_price,category_id,marca_id,marca:marcas(id,name),imagens_produtos(storage_path,is_cover,sort_order)')
-        .eq('active', true)
-        .order('name'),
-      admin.from('estoque_produtos').select('id,current_stock').eq('active', true),
-      admin.from('categorias').select('id,name').eq('active', true),
-    ])
+    const productsResult = await admin.from('vh_catalogo_produtos')
+      .select('id,slug,name,brand,category,image_key,description,sale_price,promotional_price,featured,sort_order')
+      .eq('active', true)
+      .gt('sale_price', 0)
+      .order('sort_order')
+      .order('name')
 
-    if (productsResult.error || stockResult.error || categoriesResult.error) {
+    if (productsResult.error) {
       console.error('Falha ao consultar o catálogo público.')
       return json(request, { error: 'Catálogo temporariamente indisponível.' }, 503)
     }
 
-    const stockByProduct = new Map((stockResult.data || []).map((row) => [row.id, Number(row.current_stock || 0)]))
-    const categoryById = new Map((categoriesResult.data || []).map((row) => [row.id, row.name]))
     const products = productsResult.data || []
-    const coverPaths = products.map((product) => {
-      const images = [...(product.imagens_produtos || [])].sort((a, b) =>
-        Number(b.is_cover) - Number(a.is_cover) || Number(a.sort_order || 0) - Number(b.sort_order || 0))
-      return images[0]?.storage_path || null
-    })
-    const uniquePaths = [...new Set(coverPaths.filter(Boolean))]
-    const signedResult = uniquePaths.length
-      ? await admin.storage.from('product-images').createSignedUrls(uniquePaths, 3600)
-      : { data: [], error: null }
-
-    if (signedResult.error) {
-      console.error('Falha ao gerar links temporários para imagens do catálogo.')
-      return json(request, { error: 'Catálogo temporariamente indisponível.' }, 503)
-    }
-
-    const urlByPath = new Map((signedResult.data || []).map((entry) => [entry.path, entry.signedUrl]))
-    const safeProducts = products.map((product, index) => {
+    const safeProducts = products.map((product) => {
       const sale = Number(product.sale_price || 0)
       const promotional = product.promotional_price == null ? null : Number(product.promotional_price)
       return {
         id: product.id,
+        slug: product.slug,
         name: product.name,
         description: product.description,
-        material: product.material,
-        purity: product.purity,
-        category: categoryById.get(product.category_id) || null,
-        brand: product.marca?.name || null,
+        brand: product.brand,
+        category: product.category,
+        imageKey: product.image_key,
         price: promotional != null && promotional > 0 ? promotional : sale,
-        currentStock: stockByProduct.get(product.id) || 0,
-        imageUrl: coverPaths[index] ? urlByPath.get(coverPaths[index]) || null : null,
+        oldPrice: promotional != null && promotional > 0 && promotional < sale ? sale : null,
+        featured: Boolean(product.featured),
       }
     })
 

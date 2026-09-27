@@ -5,10 +5,10 @@ Sistema interno da VH Imports, loja de tênis importados, construído com o mesm
 ## Módulos implementados
 
 - autenticação por e-mail e senha com dois usuários master;
-- dashboard com vendas, estoque, cobranças e metas;
+- dashboard com vendas, cobranças e metas;
 - pedidos manuais, status, pagamentos e parcelamentos;
 - clientes, aniversários e campanhas de reativação;
-- produtos, marcas, categorias, imagens WebP e estoque;
+- catálogo fixo de produtos, marcas, categorias e preços administráveis;
 - lucro estimado e financeiro contínuo;
 - calendário de conteúdo para Instagram;
 - auditoria e regras transacionais no Supabase;
@@ -28,7 +28,7 @@ Nunca coloque `service_role`, chaves secretas ou dados reais no frontend ou no G
 
 As migrations em `supabase/migrations` devem ser aplicadas em ordem no projeto Supabase da VH Imports. Depois execute `supabase/seed.sql`.
 
-A migration `20260925000900_vh_imports_catalog.sql` adiciona marcas, categorias de tênis e grade de numerações sem remover as regras transacionais da Finesse.
+A migration `20260926001000_vh_fixed_catalog.sql` cria o catálogo fixo da VH Imports. As fotos são assets versionados em `src/assets/`; o master altera preço, promoção e publicação no painel. O catálogo não possui controle de estoque.
 
 ## Publicação
 

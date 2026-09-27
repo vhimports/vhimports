@@ -38,6 +38,7 @@ await db.exec(await readFile(new URL('../supabase/migrations/20260921000600_link
 await db.exec(await readFile(new URL('../supabase/migrations/20260921000700_weekly_content_scheduler.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20260921000800_sales_goals.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20260925000900_vh_imports_catalog.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../supabase/migrations/20260926001000_vh_fixed_catalog.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/seed.sql',import.meta.url),'utf8'));
 await db.exec(`insert into private.master_access(slot,email,user_id) values(1,'master@example.test','${master}');`);
 const account = (await db.query('select id from public.contas_financeiras limit 1')).rows[0].id;
@@ -67,6 +68,17 @@ test('anonymous cannot read customers or execute payment functions',()=>tx(async
   await db.exec('set local role anon');
   await denied('select * from public.clientes');
   await denied('select public.mark_order_sold(gen_random_uuid())');
+}));
+test('fixed VH catalog is master-readable and price changes use the audited RPC',()=>tx(async()=>{
+  await asUser();
+  const product = (await db.query("select * from public.vh_catalogo_produtos order by sort_order limit 1")).rows[0];
+  await denied("update public.vh_catalogo_produtos set image_key='outside-code' where id=$1", [product.id]);
+  const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const result = (await db.query("select (public.update_vh_catalog_prices($1,699.90,649.90,true,true,1,$2)).*", [product.id, requestId])).rows[0];
+  assert.equal(result.sale_price, '699.90');
+  assert.equal(result.promotional_price, '649.90');
+  assert.equal(result.active, true);
+  assert.equal((await db.query("select count(*)::int count from public.logs_auditoria where entity_type='public.vh_catalogo_produtos' and entity_id=$1 and action='UPDATE'", [product.id])).rows[0].count, 1);
 }));
 test('non-master fails closed while master can operate without MFA',()=>tx(async()=>{
   await asUser(master,'aal1');

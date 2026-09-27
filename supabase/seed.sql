@@ -55,3 +55,19 @@ from (values
   ('Cartão a receber', 'card_receivable', null)
 ) as defaults(name, type, institution)
 where not exists (select 1 from public.contas_financeiras fa where fa.name = defaults.name);
+
+-- Catálogo inicial para testes. As fotos são assets fixos do frontend; os
+-- preços começam zerados e os produtos ficam ocultos até o master preenchê-los.
+insert into public.vh_catalogo_produtos (slug, name, brand, category, image_key, description, sort_order, active, featured)
+values
+  ('nike-imports-01', 'Modelo Nike Imports 01', 'Nike', 'Lifestyle', 'catalog_nike-01-hi', 'Foto fixa de teste do catálogo VH Imports.', 10, false, false),
+  ('nike-imports-02', 'Modelo Nike Imports 02', 'Nike', 'Lifestyle', 'catalog_nike-02-hi', 'Foto fixa de teste do catálogo VH Imports.', 20, false, false),
+  ('nike-imports-03', 'Modelo Nike Imports 03', 'Nike', 'Corrida', 'catalog_nike-03-hi', 'Foto fixa de teste do catálogo VH Imports.', 30, false, false),
+  ('nike-imports-04', 'Modelo Nike Imports 04', 'Nike', 'Casual', 'catalog_nike-04-hi', 'Foto fixa de teste do catálogo VH Imports.', 40, false, false)
+on conflict (slug) do update
+set name = excluded.name,
+    brand = excluded.brand,
+    category = excluded.category,
+    image_key = excluded.image_key,
+    description = excluded.description,
+    sort_order = excluded.sort_order;
