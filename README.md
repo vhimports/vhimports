@@ -5,10 +5,10 @@ Sistema interno da VH Imports, loja de tênis importados, construído com o mesm
 ## Módulos implementados
 
 - autenticação por e-mail e senha com dois usuários master;
-- dashboard com vendas, cobranças e metas;
+- dashboard com vendas, estoque, cobranças e metas;
 - pedidos manuais, status, pagamentos e parcelamentos;
 - clientes, aniversários e campanhas de reativação;
-- catálogo fixo de produtos, marcas, categorias e preços administráveis;
+- produtos, marcas, categorias, imagens WebP e estoque;
 - lucro estimado e financeiro contínuo;
 - calendário de conteúdo para Instagram;
 - auditoria e regras transacionais no Supabase;
@@ -28,7 +28,18 @@ Nunca coloque `service_role`, chaves secretas ou dados reais no frontend ou no G
 
 As migrations em `supabase/migrations` devem ser aplicadas em ordem no projeto Supabase da VH Imports. Depois execute `supabase/seed.sql`.
 
-A migration `20260926001000_vh_fixed_catalog.sql` cria o catálogo fixo da VH Imports. As fotos são assets versionados em `src/assets/`; o master altera preço, promoção e publicação no painel. O catálogo não possui controle de estoque.
+A migration `20260925000900_vh_imports_catalog.sql` adiciona marcas, categorias de tênis e grade de numerações sem remover as regras transacionais da Finesse.
+
+### Projeto configurado
+
+- Project ref: `zbmxehzprydojjfdwupp`.
+- Site URL: `https://vhimports.github.io/vhimports/`.
+- Redirect do painel: `https://vhimports.github.io/vhimports/painel.html`.
+- Bucket privado: `product-images`.
+- O ambiente local usa `.env.local`, que não é versionado.
+- A chave `service_role` nunca deve ser colocada no frontend, no GitHub ou nesta documentação.
+
+Após a configuração, o banco foi validado com seis marcas, seis categorias, seis categorias financeiras, três contas financeiras e 31 testes automatizados aprovados. A criação dos dois usuários master permanece dependente dos e-mails dos administradores.
 
 ## Publicação
 
