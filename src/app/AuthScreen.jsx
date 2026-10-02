@@ -53,7 +53,7 @@ export function AuthScreen({ configurationError = '', initialError = '' }) {
     <main className="auth-layout">
       <section className="auth-brand-panel">
         <div><div className="logo-lockup brand-logo-lockup"><img className="brand-logo-image" src={logo} alt="VH Imports — tênis importados" /></div><p className="brand-kicker">sneakers · controle interno</p></div>
-        <div className="brand-message"><p className="eyebrow">Tênis importados, organização</p><h1>Um olhar claro para cada venda.</h1><p>Gerencie preços, catálogo, recebimentos e cobranças da sua loja online em um só lugar.</p></div>
+        <div className="brand-message"><p className="eyebrow">Tênis importados, organização</p><h1>Um olhar claro para cada venda.</h1><p>Controle pedidos, estoque, recebimentos e cobranças da sua loja online em um só lugar.</p></div>
         <span className="brand-footer">Acesso restrito aos dois usuários master</span>
       </section>
       <section className="auth-form-panel"><div className="auth-card">
