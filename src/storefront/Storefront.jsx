@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import vhLogo from '../assets/vh-logo-metal.jpg'
 import { vhCatalogAssets } from '../lib/vhCatalogAssets'
+import { driveCatalog } from '../lib/driveCatalog'
 
 const WHATSAPP_NUMBER = '5562982593182'
 const defaultSupabaseUrl = 'https://zbmxehzprydojjfdwupp.supabase.co'
@@ -25,9 +26,11 @@ const categoryTiles = [
   { name: 'Por encomenda', detail: 'O modelo que você procura.', tone: 'blue' },
 ]
 
-function money(value) { return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }
-function whatsappUrl(product) {
-  const message = product ? `Olá, VH Imports! Tenho interesse no modelo ${product.name}, por ${money(product.price)}, que vi no site. Ainda está disponível?` : 'Olá, VH Imports! Vim pelo site e gostaria de conhecer os tênis disponíveis.'
+function money(value) { return value == null ? 'Consulte o valor' : Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }
+function whatsappUrl(product, size = '') {
+  const price = product?.price == null ? 'valor a confirmar' : money(product.price)
+  const selectedSize = size || 'numeração não escolhida'
+  const message = product ? `Olá, VH Imports! Tenho interesse no modelo ${product.name}, ${selectedSize}, por ${price}, que vi no site. Ainda está disponível?` : 'Olá, VH Imports! Vim pelo site e gostaria de conhecer os tênis disponíveis.'
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 }
 function ArrowIcon() { return <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3.5 10h12m-5-5 5 5-5 5" /></svg> }
@@ -44,6 +47,9 @@ export default function Storefront() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeCard, setActiveCard] = useState(null)
   const [favorites, setFavorites] = useState([])
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [selectedSize, setSelectedSize] = useState('')
 
   useEffect(() => {
     let alive = true
@@ -71,7 +77,19 @@ export default function Storefront() {
     return () => { alive = false }
   }, [catalogAttempt])
 
-  const products = remoteProducts
+  const products = useMemo(() => {
+    const normalizedRemote = remoteProducts.map((product) => {
+      const driveProduct = driveCatalog.find((item) => item.slug === product.slug)
+      return {
+        ...product,
+        gallery: product.gallery?.length ? product.gallery : [product.imageUrl].filter(Boolean),
+        sizes: product.sizes || driveProduct?.sizes || ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43'],
+        colors: product.colors || driveProduct?.colors || ['Cor do catálogo'],
+      }
+    })
+    const remoteSlugs = new Set(normalizedRemote.map((product) => product.slug))
+    return [...normalizedRemote, ...driveCatalog.filter((product) => !remoteSlugs.has(product.slug))]
+  }, [remoteProducts])
   const categories = useMemo(() => ['Todos', ...new Set(products.map((product) => product.category).filter(Boolean))], [products])
   const brands = useMemo(() => [...new Set(products.map((product) => product.brand).filter(Boolean))].map((name, index) => ({ id: name.toLowerCase().replace(/\s+/g, '-'), name, wordmark: name.toUpperCase(), detail: 'Modelos selecionados', count: products.filter((product) => product.brand === name).length, tone: brandTones[index % brandTones.length] })), [products])
   const visibleProducts = useMemo(() => products.filter((product) => {
@@ -82,6 +100,11 @@ export default function Storefront() {
   }), [products, activeBrand, activeCategory, search])
   function selectBrand(brand) { setActiveBrand(brand); document.getElementById('desejados')?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }
   function toggleFavorite(id) { setFavorites((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]) }
+  function openProduct(product) {
+    setSelectedProduct(product)
+    setSelectedImage(0)
+    setSelectedSize('')
+  }
 
   return (
     <div className="vh-site">
@@ -95,12 +118,14 @@ export default function Storefront() {
         <section className="vh-hero" id="inicio"><div className="hero-editorial"><span className="vh-kicker">VH IMPORTS <i /> DESDE 2020</span><h1>Seu próximo passo <em>começa aqui.</em></h1><p>Uma curadoria de tênis importados para quem transforma o cotidiano em estilo.</p><div className="hero-actions"><a className="vh-button" href="#desejados">Explorar coleção <ArrowIcon /></a><a className="hero-text-link" href="#marcas">Ver por marca <ArrowIcon /></a></div><div className="hero-meta"><span>01</span><span className="meta-line" /><span>ESTILO · MOVIMENTO · IDENTIDADE</span></div></div><div className="hero-visual"><div className="hero-photo hero-photo-main" /><div className="hero-photo hero-photo-detail" /><div className="hero-sticker">VH<br /><small>IMPORTS</small></div><div className="hero-product-note"><span>EM DESTAQUE</span><strong>Seu estilo não espera.</strong><a href="#desejados">Ver modelos <ArrowIcon /></a></div></div><div className="hero-scroll">SCROLL PARA DESCOBRIR <span /></div></section>
         <div className="vh-marquee" aria-label="VH Imports"><div><span>SEU RITMO</span><i>✳</i><span>SUA MARCA</span><i>✳</i><span>SEU ESTILO</span><i>✳</i><span>SEU RITMO</span><i>✳</i><span>SUA MARCA</span></div></div>
         <section className="vh-section vh-brands" id="marcas"><div className="section-heading"><div><span className="vh-kicker">EXPLORE POR MARCA</span><h2>Seu estilo, <em>sua marca.</em></h2></div><p>Escolha uma marca para encontrar o modelo que acompanha seu ritmo.</p></div><div className="brand-grid">{brands.map((brand, index) => <button key={brand.id} className={`brand-card brand-${brand.tone}`} onClick={() => selectBrand(brand.name)} style={{ '--card-delay': `${index * 70}ms` }}><span className="brand-pill">{brand.name}</span><strong>{brand.wordmark}</strong><div><span>{brand.name}</span><small>{brand.count} modelos <i>·</i> ver coleção <ArrowIcon /></small></div></button>)}</div><button className="under-link" onClick={() => selectBrand('Todos')}>Ver todas as marcas <ArrowIcon /></button></section>
-        <section className="vh-section vh-wanted" id="desejados"><div className="section-heading section-heading-products"><div><span className="vh-kicker">A CURADORIA VH</span><h2>Mais <em>desejados.</em></h2></div><div className="heading-side"><p>Modelos com preço definido pelo time VH Imports.</p><button className="under-link" onClick={() => { setActiveBrand('Todos'); setActiveCategory('Todos'); setSearch('') }}>Ver catálogo completo <ArrowIcon /></button></div></div><div className="product-toolbar"><div className="filter-tabs">{categories.map((category) => <button key={category} className={category === activeCategory ? 'is-selected' : ''} onClick={() => { setActiveCategory(category); setSearch('') }}>{category}</button>)}</div><label className="product-search"><span>⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar modelo" aria-label="Buscar modelo" /></label></div>{loading && <div className="catalog-loading"><span /> Atualizando os modelos disponíveis…</div>}{catalogError && !loading && <div className="catalog-empty">{catalogError}</div>}<div className="wanted-grid">{visibleProducts.slice(0, 8).map((product, index) => { const isActive = activeCard === product.id; const isFavorite = favorites.includes(product.id); return <article className={`wanted-card ${isActive ? 'is-active' : ''}`} key={product.id} onClick={() => setActiveCard(isActive ? null : product.id)} style={{ '--card-delay': `${index * 70}ms` }}><div className="wanted-visual"><img className="product-image-primary" src={product.imageUrl} alt={product.name} loading={index > 3 ? 'lazy' : 'eager'} /><img className="product-image-secondary" src={product.altImage || product.imageUrl} alt="" aria-hidden="true" /><span className="product-badge">{product.badge}</span><button className="favorite-button" aria-label={isFavorite ? `Remover ${product.name} dos favoritos` : `Adicionar ${product.name} aos favoritos`} onClick={(event) => { event.stopPropagation(); toggleFavorite(product.id) }}><HeartIcon filled={isFavorite} /></button><a className="visual-cta" href={whatsappUrl(product)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>Consultar modelo <ArrowIcon /></a></div><div className="wanted-info"><div><span className="product-brand-pill">{product.brand || 'VH'}</span><span className="product-line">{product.category || 'Sneaker'}</span><h3>{product.name}</h3></div><div className="product-price">{product.oldPrice && <del>{money(product.oldPrice)}</del>}<strong>{money(product.price)}</strong></div></div></article> })}</div>{!loading && !catalogError && !visibleProducts.length && <div className="catalog-empty">Nenhum modelo publicado. O administrador precisa definir o preço e ativar o modelo no painel.</div>}</section>
+        <section className="vh-section vh-wanted" id="desejados"><div className="section-heading section-heading-products"><div><span className="vh-kicker">A CURADORIA VH</span><h2>Mais <em>desejados.</em></h2></div><div className="heading-side"><p>Modelos com preço definido pelo time VH Imports.</p><button className="under-link" onClick={() => { setActiveBrand('Todos'); setActiveCategory('Todos'); setSearch('') }}>Ver catálogo completo <ArrowIcon /></button></div></div><div className="product-toolbar"><div className="filter-tabs">{categories.map((category) => <button key={category} className={category === activeCategory ? 'is-selected' : ''} onClick={() => { setActiveCategory(category); setSearch('') }}>{category}</button>)}</div><label className="product-search"><span>⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar modelo" aria-label="Buscar modelo" /></label></div>{loading && <div className="catalog-loading"><span /> Atualizando os modelos disponíveis…</div>}{catalogError && !loading && <div className="catalog-empty">{catalogError}</div>}<div className="wanted-grid">{visibleProducts.slice(0, 8).map((product, index) => { const isActive = activeCard === product.id; const isFavorite = favorites.includes(product.id); return <article className={`wanted-card ${isActive ? 'is-active' : ''}`} key={product.id} onClick={() => { setActiveCard(isActive ? null : product.id); openProduct(product) }} style={{ '--card-delay': `${index * 70}ms` }}><div className="wanted-visual"><img className="product-image-primary" src={product.imageUrl} alt={product.name} loading={index > 3 ? 'lazy' : 'eager'} /><img className="product-image-secondary" src={product.altImage || product.imageUrl} alt="" aria-hidden="true" /><span className="product-badge">{product.badge}</span><button className="favorite-button" aria-label={isFavorite ? `Remover ${product.name} dos favoritos` : `Adicionar ${product.name} aos favoritos`} onClick={(event) => { event.stopPropagation(); toggleFavorite(product.id) }}><HeartIcon filled={isFavorite} /></button><button className="visual-cta" type="button" onClick={(event) => { event.stopPropagation(); openProduct(product) }}>Ver fotos e tamanhos <ArrowIcon /></button></div><div className="wanted-info"><div><span className="product-brand-pill">{product.brand || 'VH'}</span><span className="product-line">{product.category || 'Sneaker'}</span><h3>{product.name}</h3></div><div className="product-price">{product.oldPrice && <del>{money(product.oldPrice)}</del>}<strong>{money(product.price)}</strong></div></div></article> })}</div>{!loading && !catalogError && !visibleProducts.length && <div className="catalog-empty">Nenhum modelo publicado. O administrador precisa definir o preço e ativar o modelo no painel.</div>}</section>
         <section className="vh-categories"><div className="category-intro"><span className="vh-kicker">ENCONTRE SEU RITMO</span><h2>Para onde<br /><em>você vai?</em></h2><p>Do treino ao rolê, seu próximo par começa por aqui.</p></div><div className="category-grid">{categoryTiles.map((category) => <a href={whatsappUrl()} className={`category-card category-${category.tone}`} key={category.name}><span>{category.name}</span><strong>{category.detail}</strong><ArrowIcon /></a>)}</div></section>
         <section className="vh-community" id="comunidade"><div className="community-heading"><span className="vh-kicker">NOSSA FAMÍLIA</span><h2>Quem usa VH,<br /><em>faz parte.</em></h2><p>Marque <strong>@vhimports.62</strong> para aparecer por aqui.</p></div><div className="family-grid">{familyTiles.map((tile, index) => <a href="https://www.instagram.com/vhimports.62/" target="_blank" rel="noreferrer" className="family-tile" key={tile.label} style={{ '--family-image': `url("${tile.image}")`, '--tile-delay': `${index * 80}ms` }}><span>{tile.label}</span></a>)}</div></section>
         <section className="vh-contact"><div><span className="vh-kicker">VAMOS CONVERSAR</span><h2>O próximo par<br /><em>pode ser o seu.</em></h2></div><a href={whatsappUrl()} target="_blank" rel="noreferrer" className="vh-button light">Falar com a VH Imports <ArrowIcon /></a></section>
       </main>
+      {selectedProduct && <div className="product-modal-backdrop" role="presentation" onClick={() => setSelectedProduct(null)}><section className="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title" onClick={(event) => event.stopPropagation()}><button className="product-modal-close" aria-label="Fechar detalhes" onClick={() => setSelectedProduct(null)}>×</button><div className="product-modal-gallery"><div className="product-modal-main"><img src={(selectedProduct.gallery || [selectedProduct.imageUrl])[selectedImage] || selectedProduct.imageUrl} alt={selectedProduct.name} /></div><div className="product-modal-thumbs">{(selectedProduct.gallery || [selectedProduct.imageUrl]).map((image, index) => <button key={image} type="button" className={selectedImage === index ? 'is-selected' : ''} onClick={() => setSelectedImage(index)}><img src={image} alt={`${selectedProduct.name} foto ${index + 1}`} /></button>)}</div></div><div className="product-modal-copy"><span className="product-brand-pill">{selectedProduct.brand}</span><span className="product-line">{selectedProduct.category || 'Sneaker'}</span><h2 id="product-modal-title">{selectedProduct.name}</h2><p>{selectedProduct.description || 'Selecione a numeração e fale com a VH Imports para confirmar disponibilidade.'}</p><div className="product-modal-price">{money(selectedProduct.price)}{selectedProduct.oldPrice && <del>{money(selectedProduct.oldPrice)}</del>}</div><div className="product-modal-block"><span>Numeração disponível</span><div className="size-options">{(selectedProduct.sizes || []).map((size) => <button key={size} type="button" className={selectedSize === size ? 'is-selected' : ''} onClick={() => setSelectedSize(size)}>{size}</button>)}</div></div><div className="product-modal-block"><span>Cores / variações</span><div className="color-options">{(selectedProduct.colors || []).map((color) => <span key={color}>{color}</span>)}</div></div><a className="vh-button product-modal-whatsapp" href={whatsappUrl(selectedProduct, selectedSize)} target="_blank" rel="noreferrer">Pedir pelo WhatsApp <ArrowIcon /></a><small>O pedido final depende da confirmação do estoque com a VH Imports.</small></div></section></div>}
       <footer className="vh-footer"><a href="#inicio" className="footer-logo"><img src={vhLogo} alt="VH Imports" /><span>VH IMPORTS</span></a><span>Importados com curadoria. Escolhidos para você.</span><span>© {new Date().getFullYear()} VH IMPORTS</span></footer>
     </div>
   )
 }
+
