@@ -48,9 +48,16 @@ O `index.html` compilado é copiado para a raiz pelo build, permitindo publicar 
 ## Catálogo fotográfico e fluxo de pedido
 
 As fotos recebidas no Google Drive foram identificadas por marca e modelo e versionadas em
-`src/assets/catalog-drive`. Os vídeos foram ignorados. O agrupamento atual contém Adidas
-(Adizero Evo, Campus e Samba), Asics, New Balance, Nike (Air Force, Air Jordan 1, Dunk e
-Vomero), Puma Original e Puma Replica.
+`src/assets/catalog-drive`. Os vídeos foram ignorados. A inspeção cobre as pastas `34 AO 39`
+e `38 AO 43`; a segunda faixa possui 13 pastas de marca, subpastas específicas para 7 modelos
+Adidas e 9 modelos Nike, além de 337 fotos e vídeos no total. Para preservar desempenho, o
+repositório publica 181 fotos normalizadas da faixa 38–43, com até seis imagens representativas
+por pasta/modelo. Os arquivos HEIC que eram JPEG foram normalizados para `.jpg`.
+
+O catálogo da vitrine agora inclui, além dos modelos anteriores, Forum Low, ADI2000, Jellyfish,
+Adios Pro 5, Adizero Pro 4, Campus 00s, Air Max Portal, Air Max 95, Air Max TN, Alphafly,
+Court Vision, Dunk Jumbo, Dunk Twist, Fila, Mizuno, Reserva e Vans. Os assets adicionais ficam
+em `src/assets/catalog-drive/catalog-38-43` e entram no build via `import.meta.glob`.
 
 Na vitrine, cada card abre uma ficha de produto em vez de enviar diretamente ao WhatsApp.
 A ficha apresenta as fotos do mesmo modelo, variações de cor, numerações de 34 a 43 e o
