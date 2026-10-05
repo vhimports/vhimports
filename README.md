@@ -50,9 +50,10 @@ O `index.html` compilado é copiado para a raiz pelo build, permitindo publicar 
 As fotos recebidas no Google Drive foram identificadas por marca e modelo e versionadas em
 `src/assets/catalog-drive`. Os vídeos foram ignorados. A inspeção cobre as pastas `34 AO 39`
 e `38 AO 43`; a segunda faixa possui 13 pastas de marca, subpastas específicas para 7 modelos
-Adidas e 9 modelos Nike, além de 337 fotos e vídeos no total. Para preservar desempenho, o
-repositório publica 181 fotos normalizadas da faixa 38–43, com até seis imagens representativas
-por pasta/modelo. Os arquivos HEIC que eram JPEG foram normalizados para `.jpg`.
+Adidas e 9 modelos Nike, além de 337 fotos e vídeos no total. A inspeção encontrou 181 fotos
+legíveis; para preservar desempenho, o repositório publica 140 fotos normalizadas da faixa 38–43,
+com até seis imagens representativas por pasta/modelo. Os arquivos HEIC que eram JPEG foram
+normalizados para `.jpg`.
 
 O catálogo da vitrine agora inclui, além dos modelos anteriores, Forum Low, ADI2000, Jellyfish,
 Adios Pro 5, Adizero Pro 4, Campus 00s, Air Max Portal, Air Max 95, Air Max TN, Alphafly,
