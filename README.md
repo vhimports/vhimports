@@ -70,6 +70,11 @@ O catálogo local funciona como fallback visual enquanto a função pública do 
 consultada. O administrador deve cadastrar preço, estoque e disponibilidade definitivos
 no painel antes de divulgar um modelo como disponível.
 
+Na seção `Mais desejados`, a vitrine inicia com oito destaques para preservar a leitura da
+página. O botão `Ver catálogo completo` remove esse limite e exibe todos os modelos
+publicados, mantendo busca e filtros por categoria ativos. A seleção de uma marca também
+abre a coleção completa daquela marca.
+
 ## Documentação
 
 Consulte [docs/SISTEMA.md](docs/SISTEMA.md) antes de alterar regras do produto ou do banco.
