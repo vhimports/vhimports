@@ -9,6 +9,8 @@ const catalog38Assets = import.meta.glob('../assets/catalog-drive/catalog-38-43/
   query: '?url',
 })
 
+const catalog38Base = `${import.meta.env.BASE_URL}src/assets/catalog-drive/catalog-38-43/`
+
 const supplementImages = (...prefixes) => Object.entries(catalog38Assets)
   .filter(([path]) => {
     const filename = path.split('/').pop() || ''
@@ -18,7 +20,7 @@ const supplementImages = (...prefixes) => Object.entries(catalog38Assets)
     })
   })
   .sort(([left], [right]) => left.localeCompare(right, undefined, { numeric: true }))
-  .map(([, url]) => url)
+  .map(([path]) => `${catalog38Base}${path.split('/').pop()}`)
 
 const sizes = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43']
 
