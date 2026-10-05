@@ -110,6 +110,16 @@ O agrupamento é feito em `src/lib/driveCatalog.js` por prefixos de pasta, usand
 uma galeria própria, mostrando cores, grade 34–43 e o pedido por WhatsApp; preço e estoque
 continuam condicionados ao cadastro/consulta no Supabase.
 
+### Fluxo de exibição do catálogo
+
+A vitrine inicia com oito produtos em destaque na seção `Mais desejados`, reduzindo a
+densidade visual da primeira leitura. O botão `Ver catálogo completo` define o estado de
+catálogo completo, remove o limite e renderiza todos os modelos disponíveis. Busca e filtros
+por categoria continuam aplicados sobre o conjunto completo. Ao selecionar uma marca, o
+estado também abre todos os modelos daquela marca. Essa regra está implementada em
+`src/storefront/Storefront.jsx` e foi validada no site publicado com a grade passando de 8
+para 30 modelos.
+
 ## Supabase VH Imports — configuração inicial
 
 Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
