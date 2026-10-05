@@ -91,8 +91,9 @@ Em 05/10/2026 foram verificadas todas as pastas da pasta compartilhada do catál
 - `34 AO 39`: conjunto já publicado anteriormente, com 77 fotos locais.
 - `38 AO 43`: 13 pastas de marca; as pastas `ADIDAS REPLICAS` e `NIKE REPICAS` possuem,
   respectivamente, 7 e 9 subpastas de modelos.
-- O inventário da faixa 38–43 contém 337 mídias, sendo 181 fotos selecionadas e normalizadas
-  em `src/assets/catalog-drive/catalog-38-43`; os vídeos foram deliberadamente ignorados.
+- O inventário da faixa 38–43 contém 337 mídias, sendo 181 fotos legíveis identificadas. A
+  publicação mantém até seis imagens representativas por pasta/modelo, totalizando 140 arquivos
+  JPG em `src/assets/catalog-drive/catalog-38-43`; os vídeos foram deliberadamente ignorados.
 - As fotos com extensão HEIC foram verificadas pelo conteúdo. Quando eram JPEGs apenas com
   extensão HEIC, foram renomeadas para JPG; HEIC real deve ser convertido antes de ser usado
   em navegador.
