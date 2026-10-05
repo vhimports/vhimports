@@ -45,6 +45,23 @@ Após a configuração, o banco foi validado com seis marcas, seis categorias, s
 
 O `index.html` compilado é copiado para a raiz pelo build, permitindo publicar a branch `main` pela raiz no GitHub Pages.
 
+## Catálogo fotográfico e fluxo de pedido
+
+As fotos recebidas no Google Drive foram identificadas por marca e modelo e versionadas em
+`src/assets/catalog-drive`. Os vídeos foram ignorados. O agrupamento atual contém Adidas
+(Adizero Evo, Campus e Samba), Asics, New Balance, Nike (Air Force, Air Jordan 1, Dunk e
+Vomero), Puma Original e Puma Replica.
+
+Na vitrine, cada card abre uma ficha de produto em vez de enviar diretamente ao WhatsApp.
+A ficha apresenta as fotos do mesmo modelo, variações de cor, numerações de 34 a 43 e o
+valor cadastrado no Supabase. Quando o preço ainda não foi definido, a tela exibe
+`Consulte o valor` e mantém o pedido condicionado à confirmação do estoque. O botão de
+WhatsApp inclui o modelo, a numeração escolhida e o preço/aviso correspondente.
+
+O catálogo local funciona como fallback visual enquanto a função pública do Supabase é
+consultada. O administrador deve cadastrar preço, estoque e disponibilidade definitivos
+no painel antes de divulgar um modelo como disponível.
+
 ## Documentação
 
 Consulte [docs/SISTEMA.md](docs/SISTEMA.md) antes de alterar regras do produto ou do banco.
