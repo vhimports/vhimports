@@ -84,6 +84,31 @@ Atualização visual de 25/09/2026:
 
 Validação realizada com `npm run build` e prévia local em `http://127.0.0.1:4173/?catalog=hi-res`.
 
+## Auditoria do catálogo do Google Drive — faixa 38 a 43
+
+Em 05/10/2026 foram verificadas todas as pastas da pasta compartilhada do catálogo:
+
+- `34 AO 39`: conjunto já publicado anteriormente, com 77 fotos locais.
+- `38 AO 43`: 13 pastas de marca; as pastas `ADIDAS REPLICAS` e `NIKE REPICAS` possuem,
+  respectivamente, 7 e 9 subpastas de modelos.
+- O inventário da faixa 38–43 contém 337 mídias, sendo 181 fotos selecionadas e normalizadas
+  em `src/assets/catalog-drive/catalog-38-43`; os vídeos foram deliberadamente ignorados.
+- As fotos com extensão HEIC foram verificadas pelo conteúdo. Quando eram JPEGs apenas com
+  extensão HEIC, foram renomeadas para JPG; HEIC real deve ser convertido antes de ser usado
+  em navegador.
+
+Modelos/pastas incorporados à vitrine: Forum Low, ADI2000, Adidas Jellyfish, Adios Pro 5,
+Adizero Evo, Adizero Pro 4, Campus 00s, Adidas Originals, Air Max Portal, Air Force,
+Air Jordan 1, Air Max 95, Air Max TN, Alphafly, Court Vision, Dunk, Dunk Jumbo, Dunk Twist,
+Nike Original, Asics, New Balance, Fila Original, Mizuno, Puma Original, Puma Replica,
+Reserva Original e Vans. A vitrine mantém os modelos já cadastrados da primeira faixa e passa
+a enriquecer a galeria dos modelos repetidos com as fotos da segunda faixa.
+
+O agrupamento é feito em `src/lib/driveCatalog.js` por prefixos de pasta, usando
+`import.meta.glob` para empacotar os arquivos automaticamente. Cada ficha continua abrindo
+uma galeria própria, mostrando cores, grade 34–43 e o pedido por WhatsApp; preço e estoque
+continuam condicionados ao cadastro/consulta no Supabase.
+
 ## Supabase VH Imports — configuração inicial
 
 Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
