@@ -120,6 +120,18 @@ estado também abre todos os modelos daquela marca. Essa regra está implementad
 `src/storefront/Storefront.jsx` e foi validada no site publicado com a grade passando de 8
 para 30 modelos.
 
+### Variação comercial para comparação
+
+O layout original preto foi preservado no branch GitHub
+`snapshot/black-layout-20261005`. A vitrine também possui uma alternativa visual ativada
+por `?variant=panelas`, com cabeçalho comercial fixo, hero mais direto, cards claros,
+grade de produtos com maior foco em preço e espaçamento de loja online. A variação reutiliza
+os mesmos dados e regras do catálogo: filtros, busca, favoritos, galeria de fotos,
+numerações, cores e encaminhamento do pedido pelo WhatsApp.
+
+Prévia publicada: `https://vhimports.github.io/vhimports/?variant=panelas`.
+Sem esse parâmetro, a URL principal continua exibindo a versão preta anterior.
+
 ## Supabase VH Imports — configuração inicial
 
 Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
