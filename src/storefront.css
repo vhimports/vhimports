@@ -127,3 +127,19 @@ body{background:var(--paper)}
 .panelas-variant .brand-wordmark img{filter:brightness(0) invert(1)}
 @media(max-width:700px){.brand-card>.brand-wordmark{min-height:54px}.brand-wordmark img{width:min(82%,150px);max-height:42px}.brand-wordmark-fallback{font-size:24px!important}}
 
+/* Hero: produto real do catálogo e detalhes visuais responsivos. */
+.hero-orbit{position:absolute;z-index:0;border:1px solid rgba(16,18,20,.18);border-radius:50%;pointer-events:none;animation:orbit-drift 12s ease-in-out infinite}
+.hero-photo{z-index:1}.hero-sticker,.hero-floating-label,.hero-color-dots,.hero-product-note{z-index:2}
+.hero-orbit-one{width:74%;aspect-ratio:1;right:-13%;top:-12%}
+.hero-orbit-two{width:45%;aspect-ratio:1;left:-12%;bottom:-20%;border-style:dashed;animation-direction:reverse;animation-duration:9s}
+.hero-floating-label{position:absolute;right:9%;top:4%;display:flex;flex-direction:column;gap:5px;padding:9px 11px;border-left:2px solid #779080;background:rgba(244,241,236,.82);color:#47574d;font-size:7px;letter-spacing:.16em;box-shadow:0 8px 18px rgba(30,30,27,.1);animation:note-enter 1s .5s both}
+.hero-floating-label strong{font-size:10px;color:#101214}
+.hero-color-dots{position:absolute;right:4%;bottom:17%;display:flex;gap:6px;padding:7px 8px;background:rgba(244,241,236,.9);box-shadow:0 8px 18px rgba(30,30,27,.1)}
+.hero-color-dots span{width:7px;height:7px;border-radius:50%;background:#101214}.hero-color-dots span:nth-child(2){background:#e6e0d5}.hero-color-dots span:nth-child(3){background:#779080}
+.panelas-variant .hero-orbit{border-color:rgba(245,245,242,.17)}
+.panelas-variant .hero-floating-label,.panelas-variant .hero-color-dots{background:rgba(17,20,21,.88);color:#d8dcda;border:1px solid rgba(245,245,242,.14)}
+.panelas-variant .hero-floating-label{border-left:2px solid #b7c9bb}.panelas-variant .hero-floating-label strong{color:#f5f5f2}
+.panelas-variant .hero-color-dots span:first-child{background:#f5f5f2}.panelas-variant .hero-color-dots span:nth-child(2){background:#7e8784}.panelas-variant .hero-color-dots span:nth-child(3){background:#b7c9bb}
+@keyframes orbit-drift{0%,100%{transform:rotate(0deg) translate(0,0)}50%{transform:rotate(8deg) translate(8px,-8px)}}
+@media(max-width:700px){.hero-sticker{display:none}.hero-floating-label{right:8%;top:3%;font-size:6px;padding:8px 9px}.hero-floating-label strong{font-size:9px}.hero-color-dots{right:3%;bottom:17%;padding:6px 7px}.hero-color-dots span{width:6px;height:6px}.hero-orbit-one{width:96%;right:-34%;top:-11%}.hero-orbit-two{width:65%;left:-26%;bottom:-18%}}
+
