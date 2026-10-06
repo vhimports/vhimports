@@ -132,6 +132,24 @@ numerações, cores e encaminhamento do pedido pelo WhatsApp.
 Prévia publicada: `https://vhimports.github.io/vhimports/?variant=panelas`.
 Sem esse parâmetro, a URL principal continua exibindo a versão preta anterior.
 
+### Tema preto, logo e seção de promoções
+
+Na atualização de 06/10/2026, a variação comercial passou a usar o tema preto como
+base, com fundos escuros, superfícies em camadas, círculos de contorno e brilho
+discreto para evitar uma composição estática. A logo real da VH Imports é usada no
+destaque principal do hero, mantendo a assinatura visual da marca.
+
+Foi criada a seção `Itens em promoção`, com seis modelos variados do catálogo
+(Adidas, Nike, Asics, New Balance, Puma e Vans). Os valores desta seção são uma
+vitrine de teste: quando o modelo ainda não possui preço no Supabase, o frontend
+aplica um preço demonstrativo, sinaliza `Preço demonstrativo` e altera a mensagem do
+WhatsApp para exigir confirmação. Assim que os preços reais forem cadastrados, eles
+passam a ser usados automaticamente e o aviso de teste deixa de aparecer.
+
+O fluxo de clique é o mesmo do catálogo: o card abre a ficha com fotos do modelo,
+numerações, cores/variações e o botão de pedido pelo WhatsApp. O menu também possui
+atalho para `Promoções`.
+
 ### Campo de preço na seção Mais vendidos
 
 Na variação `panelas`, os cards da seção `Mais vendidos` exibem o desconto calculado a
