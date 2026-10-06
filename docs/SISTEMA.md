@@ -182,3 +182,17 @@ marca preferida`. Cada card exibe a logo correspondente no espaço central, pres
 nome da marca e a quantidade de modelos na base. As logos são carregadas pela CDN do
 Simple Icons com fallback para o wordmark em texto quando o asset não estiver disponível;
 isso evita que um bloqueio externo deixe o card vazio.
+
+## Hero responsivo com fotos do catálogo
+
+Na variação comercial, o hero agora referencia produtos reais versionados em
+`src/assets/catalog-drive`: o Adidas Adizero Evo ocupa o campo principal e o Adidas
+Campus aparece como imagem de apoio. A composição também inclui uma etiqueta de
+curadoria, pontos de cor e círculos de movimento em CSS para dar profundidade ao
+tema preto sem criar ruído.
+
+No breakpoint de celular, `.hero-sticker` fica oculto. Essa regra remove o selo/logo
+circular que ocupava espaço e podia parecer uma marca d'água gigante no fundo. Os
+elementos auxiliares continuam responsivos, menores e com contraste adequado. O
+hero permanece acessível: a imagem principal recebe `aria-label`, os links mantêm
+foco visível e o botão de compra continua levando à seção de produtos.
