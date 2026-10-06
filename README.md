@@ -93,6 +93,18 @@ Essa variação mantém o mesmo catálogo, filtros, favoritos, ficha com galeria
 numerações, cores e pedido por WhatsApp. O endereço principal, sem o parâmetro
 `variant=panelas`, continua usando o tema preto salvo anteriormente.
 
+### Atualização visual: tema preto e promoções
+
+A variação `?variant=panelas` recebeu um acabamento preto para a loja, com formas
+circulares abstratas no fundo, contraste alto e a logo da VH Imports aplicada no
+destaque principal. Também foi adicionada a seção `Itens em promoção`, com modelos
+variados do catálogo e descontos/parcelamentos demonstrativos para validar o layout.
+
+Os cards de promoção abrem a mesma ficha de produto do catálogo, incluindo galeria,
+cores, numerações e pedido pelo WhatsApp. Enquanto não houver preço real no Supabase,
+eles exibem `Preço demonstrativo` e o WhatsApp informa que o valor precisa ser
+confirmado; substitua esses valores cadastrando `price` e `oldPrice` no catálogo.
+
 ## Documentação
 
 Consulte [docs/SISTEMA.md](docs/SISTEMA.md) antes de alterar regras do produto ou do banco.
