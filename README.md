@@ -108,3 +108,10 @@ confirmado; substitua esses valores cadastrando `price` e `oldPrice` no catálog
 ## Documentação
 
 Consulte [docs/SISTEMA.md](docs/SISTEMA.md) antes de alterar regras do produto ou do banco.
+
+### Marcas na vitrine
+
+Na seção `Escolha sua marca preferida`, cada card agora usa a logo da marca no destaque
+central, com fallback textual para preservar a leitura caso uma logo externa não carregue.
+As logos são exibidas em alto contraste no tema preto e continuam abrindo a coleção
+completa da marca ao clicar no card.
