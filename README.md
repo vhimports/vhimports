@@ -115,3 +115,14 @@ Na seção `Escolha sua marca preferida`, cada card agora usa a logo da marca no
 central, com fallback textual para preservar a leitura caso uma logo externa não carregue.
 As logos são exibidas em alto contraste no tema preto e continuam abrindo a coleção
 completa da marca ao clicar no card.
+
+### Hero com produto real e composição responsiva
+
+O destaque inicial da variação comercial usa fotos reais do catálogo local: o Adidas
+Adizero Evo como produto principal e o Adidas Campus como detalhe secundário. Etiqueta
+de curadoria, pontos de variação e círculos de movimento adicionam ritmo visual sem
+competir com a fotografia.
+
+Em telas pequenas, o selo circular da VH é ocultado para preservar a hierarquia do
+produto e evitar o logotipo gigante no fundo. A composição mantém apenas elementos
+auxiliares leves, com contraste adaptado ao tema preto e controles de navegação claros.
