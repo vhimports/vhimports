@@ -120,3 +120,10 @@ body{background:var(--paper)}
 @media(max-width:1000px){.promotion-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.panelas-variant .vh-nav{background:#080909;box-shadow:0 14px 25px rgba(0,0,0,.45)}.panelas-variant .vh-hero{background:#0a0b0c}.panelas-variant .hero-sticker{width:62px;height:62px}.promotion-grid{gap:17px 10px}.promotion-info{padding:11px 10px 13px}.promotion-info h3{font-size:16px}.promotion-info>div:first-child{min-height:70px}.panelas-variant .vh-brands:before,.panelas-variant .vh-wanted:before,.panelas-variant .vh-promotions:before{width:70vw;height:70vw;right:-38vw}}
 
+/* Logos das marcas no centro dos cards, com fallback textual para marcas sem asset externo. */
+.brand-card>.brand-wordmark{align-self:center;display:flex!important;align-items:center;justify-content:center;width:100%;min-height:66px}
+.brand-wordmark img{display:block;width:min(76%,220px);max-width:100%;height:auto;max-height:58px;object-fit:contain}
+.brand-wordmark-fallback{font:700 clamp(25px,3vw,44px)/1 var(--display)!important;letter-spacing:.02em!important;color:currentColor!important;text-align:center}
+.panelas-variant .brand-wordmark img{filter:brightness(0) invert(1)}
+@media(max-width:700px){.brand-card>.brand-wordmark{min-height:54px}.brand-wordmark img{width:min(82%,150px);max-height:42px}.brand-wordmark-fallback{font-size:24px!important}}
+
