@@ -75,6 +75,12 @@ página. O botão `Ver catálogo completo` remove esse limite e exibe todos os m
 publicados, mantendo busca e filtros por categoria ativos. A seleção de uma marca também
 abre a coleção completa daquela marca.
 
+Na variação comercial, a seção é apresentada como `Mais vendidos`. Quando o produto possui
+preço atual e preço anterior, o card calcula e exibe o desconto em verde, mantém o preço
+anterior riscado e mostra a condição de parcelamento em até 12 vezes. Esses valores são
+calculados a partir dos dados reais cadastrados no Supabase; produtos sem preço continuam
+exibindo `Consulte o valor`.
+
 ### Prévia alternativa de layout
 
 A versão preta atual foi preservada no branch `snapshot/black-layout-20261005`.
