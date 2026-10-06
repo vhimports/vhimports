@@ -75,6 +75,18 @@ página. O botão `Ver catálogo completo` remove esse limite e exibe todos os m
 publicados, mantendo busca e filtros por categoria ativos. A seleção de uma marca também
 abre a coleção completa daquela marca.
 
+### Prévia alternativa de layout
+
+A versão preta atual foi preservada no branch `snapshot/black-layout-20261005`.
+Para comparar uma proposta mais comercial, inspirada na organização de vitrines de
+sneaker shops como a Panela Sneakers, abra:
+
+`https://vhimports.github.io/vhimports/?variant=panelas`
+
+Essa variação mantém o mesmo catálogo, filtros, favoritos, ficha com galeria,
+numerações, cores e pedido por WhatsApp. O endereço principal, sem o parâmetro
+`variant=panelas`, continua usando o tema preto salvo anteriormente.
+
 ## Documentação
 
 Consulte [docs/SISTEMA.md](docs/SISTEMA.md) antes de alterar regras do produto ou do banco.
