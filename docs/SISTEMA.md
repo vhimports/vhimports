@@ -174,3 +174,11 @@ Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
 Pendência operacional: criar a primeira conta de administrador em Supabase Auth e provisioná-la como master após o e-mail do responsável ser definido. O `seed.sql` não cria usuários nem dados reais de clientes.
 
 Validação pós-configuração: contagens confirmadas no banco (`marcas=6`, `categorias=6`, `categorias_financeiras=6`, `contas_financeiras=3`, `bucket_privado=1`) e 31 testes automatizados aprovados com `npm test`.
+
+## Logos das marcas e título da seção
+
+Na variação comercial `?variant=panelas`, o título da seção de marcas é `Escolha sua
+marca preferida`. Cada card exibe a logo correspondente no espaço central, preservando o
+nome da marca e a quantidade de modelos na base. As logos são carregadas pela CDN do
+Simple Icons com fallback para o wordmark em texto quando o asset não estiver disponível;
+isso evita que um bloqueio externo deixe o card vazio.
