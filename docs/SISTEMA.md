@@ -132,6 +132,14 @@ numerações, cores e encaminhamento do pedido pelo WhatsApp.
 Prévia publicada: `https://vhimports.github.io/vhimports/?variant=panelas`.
 Sem esse parâmetro, a URL principal continua exibindo a versão preta anterior.
 
+### Campo de preço na seção Mais vendidos
+
+Na variação `panelas`, os cards da seção `Mais vendidos` exibem o desconto calculado a
+partir de `oldPrice` e `price`, o valor anterior riscado, o preço atual e uma condição
+visual de parcelamento em até 12 vezes. A vitrine não cria preços fictícios: se o Supabase
+não tiver preço definido, o card permanece como `Consulte o valor`. O cálculo e a marcação
+estão em `src/storefront/Storefront.jsx`, com a apresentação em `src/storefront.css`.
+
 ## Supabase VH Imports — configuração inicial
 
 Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
