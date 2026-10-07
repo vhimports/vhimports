@@ -1,8 +1,10 @@
-const catalogBaseAssets = import.meta.glob('../assets/catalog-drive/*.{jpg,jpeg,png,webp}', {
-  eager: true,
-  import: 'default',
-  query: '?url',
-})
+import catalogImageFiles from './catalogDriveImages.json'
+
+const catalogAssetUrl = (path) => `${import.meta.env.BASE_URL}src/assets/catalog-drive/${path}`
+const catalogBaseAssets = catalogImageFiles.map((path) => [
+  `../assets/catalog-drive/${path}`,
+  catalogAssetUrl(path),
+])
 
 const imagesFor = (prefix, count) => Array.from({ length: count }, (_, index) => {
   const filename = `${prefix}-${String(index + 1).padStart(2, '0')}.jpg`
@@ -10,11 +12,7 @@ const imagesFor = (prefix, count) => Array.from({ length: count }, (_, index) =>
   return match?.[1] || ''
 }).filter(Boolean)
 
-const catalog38Assets = import.meta.glob('../assets/catalog-drive/catalog-38-43/*.jpg', {
-  eager: true,
-  import: 'default',
-  query: '?url',
-})
+const catalog38Assets = catalogBaseAssets.filter(([path]) => path.includes('/catalog-38-43/'))
 
 const supplementImages = (...prefixes) => Object.entries(catalog38Assets)
   .filter(([path]) => {
