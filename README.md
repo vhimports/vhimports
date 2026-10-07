@@ -126,3 +126,22 @@ competir com a fotografia.
 Em telas pequenas, o selo circular da VH é ocultado para preservar a hierarquia do
 produto e evitar o logotipo gigante no fundo. A composição mantém apenas elementos
 auxiliares leves, com contraste adaptado ao tema preto e controles de navegação claros.
+
+### Catálogo unificado e direção off-white
+
+Na revisão de 07/10/2026, os rótulos `Original`, `Replica` e `Réplica` deixaram de criar
+marcas diferentes. O frontend normaliza esses sufixos e agrupa os produtos pela marca
+principal — por exemplo, Puma Original e Puma Replica aparecem juntos em Puma. O mesmo
+tratamento vale para Nike Original, Fila Original e Reserva Original, sem alterar os
+arquivos de fotos ou os identificadores dos produtos.
+
+As pastas `34 AO 39` e `38 AO 43` do Drive compartilhado foram verificadas. Elas contêm
+Adidas, Asics, Fila, New Balance, Nike, Puma, Mizuno, Reserva e Vans, além dos modelos
+organizados por faixa de numeração. Não foram encontrados arquivos ou pastas identificáveis
+como Prada, Louis Vuitton, Golden Goose, Hugo Boss, Armani ou Mont Blanc; por isso essas
+marcas não foram inventadas na vitrine e ficam pendentes de fotos reais no Drive.
+
+A variação `?variant=panelas` agora usa uma paleta off-white editorial: fundo marfim,
+cartões claros, preto suave para ações e verde acinzentado como acento. A hierarquia,
+galeria, filtros, modal de produto e pedido via WhatsApp permanecem iguais, com contraste
+adaptado para desktop e celular.
