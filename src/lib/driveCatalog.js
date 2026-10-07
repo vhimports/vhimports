@@ -1,4 +1,3 @@
-const catalogBase = `${import.meta.env.BASE_URL}src/assets/catalog-drive/`
 const catalogBaseAssets = import.meta.glob('../assets/catalog-drive/*.{jpg,jpeg,png,webp}', {
   eager: true,
   import: 'default',
@@ -8,7 +7,7 @@ const catalogBaseAssets = import.meta.glob('../assets/catalog-drive/*.{jpg,jpeg,
 const imagesFor = (prefix, count) => Array.from({ length: count }, (_, index) => {
   const filename = `${prefix}-${String(index + 1).padStart(2, '0')}.jpg`
   const match = Object.entries(catalogBaseAssets).find(([path]) => path.endsWith(`/${filename}`))
-  return import.meta.env.DEV && match?.[1] ? match[1] : `${catalogBase}${filename}`
+  return match?.[1] || ''
 }).filter(Boolean)
 
 const catalog38Assets = import.meta.glob('../assets/catalog-drive/catalog-38-43/*.jpg', {
@@ -16,8 +15,6 @@ const catalog38Assets = import.meta.glob('../assets/catalog-drive/catalog-38-43/
   import: 'default',
   query: '?url',
 })
-
-const catalog38Base = `${import.meta.env.BASE_URL}src/assets/catalog-drive/catalog-38-43/`
 
 const supplementImages = (...prefixes) => Object.entries(catalog38Assets)
   .filter(([path]) => {
@@ -28,7 +25,7 @@ const supplementImages = (...prefixes) => Object.entries(catalog38Assets)
     })
   })
   .sort(([left], [right]) => left.localeCompare(right, undefined, { numeric: true }))
-  .map(([path, url]) => import.meta.env.DEV ? url : `${catalog38Base}${path.split('/').pop()}`)
+  .map(([, url]) => url)
 
 const sizes = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43']
 
