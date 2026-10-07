@@ -8,13 +8,13 @@ const catalogBaseAssets = catalogImageFiles.map((path) => [
 
 const imagesFor = (prefix, count) => Array.from({ length: count }, (_, index) => {
   const filename = `${prefix}-${String(index + 1).padStart(2, '0')}.jpg`
-  const match = Object.entries(catalogBaseAssets).find(([path]) => path.endsWith(`/${filename}`))
+  const match = catalogBaseAssets.find(([path]) => path.endsWith(`/${filename}`))
   return match?.[1] || ''
 }).filter(Boolean)
 
 const catalog38Assets = catalogBaseAssets.filter(([path]) => path.includes('/catalog-38-43/'))
 
-const supplementImages = (...prefixes) => Object.entries(catalog38Assets)
+const supplementImages = (...prefixes) => catalog38Assets
   .filter(([path]) => {
     const filename = path.split('/').pop() || ''
     return prefixes.some((prefix) => {
