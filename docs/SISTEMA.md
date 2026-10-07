@@ -196,3 +196,26 @@ circular que ocupava espaço e podia parecer uma marca d'água gigante no fundo.
 elementos auxiliares continuam responsivos, menores e com contraste adequado. O
 hero permanece acessível: a imagem principal recebe `aria-label`, os links mantêm
 foco visível e o botão de compra continua levando à seção de produtos.
+
+### Unificação de marcas e conferência do Drive
+
+Em 07/10/2026, o catálogo passou a normalizar os sufixos `Original`, `Replica` e
+`Réplica` no frontend. A regra é aplicada tanto aos produtos locais quanto às linhas
+retornadas pelo endpoint público do Supabase, evitando que uma variação de nomenclatura
+crie uma marca ou filtro separado. Puma Original e Puma Replica, por exemplo, ficam
+na marca Puma; Nike Original, Fila Original e Reserva Original seguem a mesma lógica.
+
+Foram conferidas as pastas compartilhadas `34 AO 39` e `38 AO 43` do Drive usado como
+origem do catálogo. As pastas encontradas cobrem Adidas, Asics, Fila, New Balance, Nike,
+Puma, Mizuno, Reserva e Vans, com modelos e fotos por numeração. As buscas por Prada,
+Louis Vuitton, Golden Goose, Hugo Boss, Armani e Mont Blanc não retornaram arquivos ou
+pastas no Drive compartilhado. Essas marcas só devem ser adicionadas após o envio das
+fotos correspondentes, evitando cards sem produto real.
+
+### Paleta off-white
+
+A variação comercial `?variant=panelas` foi redesenhada com fundo off-white (`#f4f1eb`),
+superfícies marfim, preto suave para títulos e ações, e verde acinzentado para ênfase.
+O hero, marcas, mais vendidos, promoções, categorias, comunidade, contato, rodapé e
+modal de produto receberam tokens e contrastes específicos. A mudança é escopada à
+variação comercial; a versão preta original permanece preservada para comparação.
