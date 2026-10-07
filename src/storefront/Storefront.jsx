@@ -16,11 +16,22 @@ const brandLogoSources = {
   'New Balance': 'https://cdn.simpleicons.org/newbalance/101214',
   Nike: 'https://cdn.simpleicons.org/nike/101214',
   Puma: 'https://cdn.simpleicons.org/puma/101214',
-  'Puma Replica': 'https://cdn.simpleicons.org/puma/101214',
   Fila: 'https://cdn.simpleicons.org/fila/101214',
   Mizuno: 'https://cdn.simpleicons.org/mizuno/101214',
   Reserva: 'https://cdn.simpleicons.org/reserva/101214',
   Vans: 'https://cdn.simpleicons.org/vans/101214',
+}
+
+function canonicalBrandName(value) {
+  const label = String(value || '').trim()
+  if (!label) return label
+  return label.replace(/\s+(?:réplica|replica)$/i, '').replace(/\s+original$/i, '').trim() || label
+}
+
+function catalogDisplayName(value) {
+  const label = String(value || '').trim()
+  if (!label) return label
+  return label.replace(/\s+(?:réplica|replica)$/i, '').replace(/\s+original$/i, '').trim() || label
 }
 
 const familyTiles = [
@@ -118,13 +129,20 @@ export default function Storefront() {
       const driveProduct = driveCatalog.find((item) => item.slug === product.slug)
       return {
         ...product,
+        brand: canonicalBrandName(product.brand),
+        name: catalogDisplayName(product.name),
         gallery: product.gallery?.length ? product.gallery : [product.imageUrl].filter(Boolean),
         sizes: product.sizes || driveProduct?.sizes || ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43'],
         colors: product.colors || driveProduct?.colors || ['Cor do catálogo'],
       }
     })
     const remoteSlugs = new Set(normalizedRemote.map((product) => product.slug))
-    return [...normalizedRemote, ...driveCatalog.filter((product) => !remoteSlugs.has(product.slug))]
+    const normalizedDrive = driveCatalog.map((product) => ({
+      ...product,
+      brand: canonicalBrandName(product.brand),
+      name: catalogDisplayName(product.name),
+    }))
+    return [...normalizedRemote, ...normalizedDrive.filter((product) => !remoteSlugs.has(product.slug))]
   }, [remoteProducts])
   const categories = useMemo(() => ['Todos', ...new Set(products.map((product) => product.category).filter(Boolean))], [products])
   const brands = useMemo(() => [...new Set(products.map((product) => product.brand).filter(Boolean))].map((name, index) => ({ id: name.toLowerCase().replace(/\s+/g, '-'), name, wordmark: name.toUpperCase(), logo: brandLogoSources[name], detail: 'Modelos selecionados', count: products.filter((product) => product.brand === name).length, tone: brandTones[index % brandTones.length] })), [products])
