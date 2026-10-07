@@ -145,3 +145,11 @@ A variação `?variant=panelas` agora usa uma paleta off-white editorial: fundo 
 cartões claros, preto suave para ações e verde acinzentado como acento. A hierarquia,
 galeria, filtros, modal de produto e pedido via WhatsApp permanecem iguais, com contraste
 adaptado para desktop e celular.
+
+### Marcas aguardando catálogo
+
+Foram adicionados cards para Prada, Louis Vuitton, Golden Goose, Hugo Boss, Armani e
+Mont Blanc. Cada card exibe a logo da marca e o estado `Em breve`, pois a conferência do
+Drive ainda não encontrou fotos ou modelos dessas coleções. Enquanto não houver produtos
+reais cadastrados, os cards permanecem visuais e não abrem um filtro vazio. As logos usam
+Simple Icons CDN com fallback para o nome da marca caso algum asset externo não carregue.
