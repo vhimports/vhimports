@@ -39,7 +39,9 @@ A migration `20260925000900_vh_imports_catalog.sql` adiciona marcas, categorias 
 - O ambiente local usa `.env.local`, que não é versionado.
 - A chave `service_role` nunca deve ser colocada no frontend, no GitHub ou nesta documentação.
 
-Após a configuração, o banco foi validado com seis marcas, seis categorias, seis categorias financeiras, três contas financeiras e 31 testes automatizados aprovados. A criação dos dois usuários master permanece dependente dos e-mails dos administradores.
+Após a configuração, o banco foi validado com seis marcas, seis categorias, seis categorias financeiras, três contas financeiras e 33 testes automatizados aprovados. A criação dos dois usuários master permanece dependente dos e-mails dos administradores.
+
+Na vitrine, o catálogo completo é exibido com abas por marca. No painel `Produtos e preços`, o master pode cadastrar rapidamente um novo modelo escolhendo uma foto fixa, informando marca/categoria, preço normal, preço promocional opcional e publicação.
 
 ## Publicação
 

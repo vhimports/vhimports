@@ -39,6 +39,7 @@ await db.exec(await readFile(new URL('../supabase/migrations/20260921000700_week
 await db.exec(await readFile(new URL('../supabase/migrations/20260921000800_sales_goals.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20260925000900_vh_imports_catalog.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20260926001000_vh_fixed_catalog.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../supabase/migrations/20261015001100_vh_catalog_quick_add.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/seed.sql',import.meta.url),'utf8'));
 await db.exec(`insert into private.master_access(slot,email,user_id) values(1,'master@example.test','${master}');`);
 const account = (await db.query('select id from public.contas_financeiras limit 1')).rows[0].id;
@@ -79,6 +80,19 @@ test('fixed VH catalog is master-readable and price changes use the audited RPC'
   assert.equal(result.promotional_price, '649.90');
   assert.equal(result.active, true);
   assert.equal((await db.query("select count(*)::int count from public.logs_auditoria where entity_type='public.vh_catalogo_produtos' and entity_id=$1 and action='UPDATE'", [product.id])).rows[0].count, 1);
+}));
+test('master can add a fixed-photo catalog model and promotion while non-master is denied',()=>tx(async()=>{
+  await asUser();
+  const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const result = (await db.query("select (public.create_vh_catalog_product($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)).*", [
+    'test-adidas-campus-00s', 'Campus 00s teste', 'Adidas', 'Lifestyle', 'catalog_nike-01-hi', 'Modelo criado no teste', 899.90, 799.90, true, false, 999, requestId,
+  ])).rows[0];
+  assert.equal(result.brand, 'Adidas');
+  assert.equal(result.sale_price, '899.90');
+  assert.equal(result.promotional_price, '799.90');
+  assert.equal(result.active, true);
+  await db.exec('reset role'); await asUser(other);
+  await denied("select public.create_vh_catalog_product('test-adidas-campus-00s-2','Outro','Adidas','Lifestyle','catalog_nike-01-hi','',100,null,false,false,100,gen_random_uuid())");
 }));
 test('non-master fails closed while master can operate without MFA',()=>tx(async()=>{
   await asUser(master,'aal1');

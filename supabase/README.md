@@ -10,7 +10,7 @@ O backend replica a base segura do sistema Finesse e adapta o catálogo da VH Im
 4. Crie as contas master pelo fluxo de convite.
 5. Preencha apenas `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` e `VITE_AUTH_REDIRECT_URL`.
 
-A migration `20260926001000_vh_fixed_catalog.sql` cria `vh_catalogo_produtos`. Ela não cria estoque: cada registro aponta para uma foto fixa por `image_key`, e o master altera preço, promoção, destaque, ordem e publicação pela RPC `update_vh_catalog_prices`.
+A migration `20260926001000_vh_fixed_catalog.sql` cria `vh_catalogo_produtos`. A migration `20261015001100_vh_catalog_quick_add.sql` completa o catálogo inicial e cria a RPC `create_vh_catalog_product` para o cadastro rápido de novos modelos. Elas não criam estoque: cada registro aponta para uma foto fixa por `image_key`, e o master controla preço normal, preço promocional, destaque, ordem e publicação pelas RPCs auditadas.
 
 Não copie o projeto do Finesse nem reutilize a URL de produção dele: isso misturaria dados e usuários.
 
@@ -26,6 +26,7 @@ As operações abaixo permanecem versionadas para os módulos legados de pedidos
 - `create_manual_order`: cria pedido com chave idempotente;
 - `edit_order_details` e `edit_installment_due_date`: corrigem dados sem apagar histórico.
 - `update_vh_catalog_prices`: altera os valores e o estado público dos produtos fixos com auditoria e idempotência.
+- `create_vh_catalog_product`: cadastra um novo modelo usando uma foto fixa e os valores comerciais informados pelo master.
 
 ## Imagens
 

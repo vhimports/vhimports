@@ -26,11 +26,13 @@ Não existe baixa direta de estoque pela interface; ajustes usam `adjust_stock`.
 
 ## Catálogo e estoque
 
-O catálogo é organizado por marca, categoria, modelo/SKU, grade de numeração, preço de custo, preço de venda, preço promocional, imagens privadas e estoque por numeração.
+Na VH Imports, a vitrine pública exibe o catálogo completo de tênis organizado por marca, categoria e modelo. As fotos são fixas e versionadas no projeto; o banco guarda a chave da foto, os dados comerciais e o estado de publicação. Não existe controle de estoque para a vitrine pública.
 
-As marcas iniciais são Nike, Adidas, Asics, New Balance, Puma e Olympikus. O cadastro continua aberto para novas marcas.
+As marcas iniciais do catálogo incluem Adidas, Nike, Asics, New Balance, Puma, Fila, Mizuno, Reserva e Vans. O cadastro continua aberto para novas marcas.
 
-O bucket `product-images` é privado. O frontend utiliza URLs assinadas e nunca recebe a `service_role`.
+Na vitrine, a seção de marcas funciona como uma navegação por abas: selecionar uma marca filtra todo o catálogo para aquela marca, atualiza a URL com `?marca=<slug>` e preserva a seleção ao recarregar a página.
+
+O painel master possui um cadastro rápido em `Produtos e preços`. Para criar um modelo, o administrador informa nome, marca, categoria, foto fixa, preço normal, preço promocional opcional, ordem, publicação e destaque. O identificador é gerado automaticamente a partir da marca e do nome. A criação usa a RPC auditada `create_vh_catalog_product`; a alteração de valores usa `update_vh_catalog_prices`.
 
 ## Financeiro e cobranças
 
@@ -62,7 +64,9 @@ Aplicar, em ordem:
 7. `20260921000700_weekly_content_scheduler.sql`
 8. `20260921000800_sales_goals.sql`
 9. `20260925000900_vh_imports_catalog.sql`
-10. `supabase/seed.sql`
+10. `20260926001000_vh_fixed_catalog.sql`
+11. `20261015001100_vh_catalog_quick_add.sql`
+12. `supabase/seed.sql`
 
 ## Estado desta versão
 
@@ -112,13 +116,15 @@ continuam condicionados ao cadastro/consulta no Supabase.
 
 ### Fluxo de exibição do catálogo
 
-A vitrine inicia com oito produtos em destaque na seção `Mais desejados`, reduzindo a
-densidade visual da primeira leitura. O botão `Ver catálogo completo` define o estado de
-catálogo completo, remove o limite e renderiza todos os modelos disponíveis. Busca e filtros
-por categoria continuam aplicados sobre o conjunto completo. Ao selecionar uma marca, o
-estado também abre todos os modelos daquela marca. Essa regra está implementada em
-`src/storefront/Storefront.jsx` e foi validada no site publicado com a grade passando de 8
-para 30 modelos.
+A vitrine inicia diretamente com todos os modelos disponíveis. Busca, filtros por categoria
+e abas por marca continuam aplicados sobre o conjunto completo. Ao selecionar uma marca no
+carrossel ou na barra de abas, o estado filtra a grade para aquela marca, atualiza a query
+`marca` e rola até o catálogo. A regra está implementada em `src/storefront/Storefront.jsx`.
+
+As imagens disponíveis para o cadastro são expostas por `src/lib/vhCatalogAssets.js`. Para
+adicionar novas fotos no futuro, elas devem ser versionadas no projeto e incluídas no mapa de
+assets; depois disso o administrador poderá selecioná-las no campo `Foto fixa`, sem upload
+ou estoque no painel.
 
 ### Variação comercial para comparação
 
@@ -164,7 +170,7 @@ Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
 
 - Project ref: `zbmxehzprydojjfdwupp`.
 - Projeto em estado saudável e separado da operação Finesse.
-- As nove migrations foram executadas em ordem, incluindo segurança, operações, cobranças, dashboard, conteúdo semanal, metas e catálogo de marcas/numerações.
+- As onze migrations são executadas em ordem, incluindo segurança, operações, cobranças, dashboard, conteúdo semanal, metas, catálogo fixo e cadastro rápido de modelos.
 - `supabase/seed.sql` aplicado com seis marcas, seis categorias, seis categorias financeiras e três contas financeiras padrão.
 - Bucket privado `product-images` criado com suporte a JPEG, PNG e WebP e limite de 5 MiB.
 - Site URL configurada para `https://vhimports.github.io/vhimports/`.
@@ -173,7 +179,7 @@ Configuração aplicada no projeto Supabase da VH Imports em 25/09/2026:
 
 Pendência operacional: criar a primeira conta de administrador em Supabase Auth e provisioná-la como master após o e-mail do responsável ser definido. O `seed.sql` não cria usuários nem dados reais de clientes.
 
-Validação pós-configuração: contagens confirmadas no banco (`marcas=6`, `categorias=6`, `categorias_financeiras=6`, `contas_financeiras=3`, `bucket_privado=1`) e 31 testes automatizados aprovados com `npm test`.
+Validação pós-configuração: contagens confirmadas no banco (`marcas=6`, `categorias=6`, `categorias_financeiras=6`, `contas_financeiras=3`, `bucket_privado=1`) e 33 testes automatizados aprovados com `npm test`.
 
 ## Logos das marcas e título da seção
 

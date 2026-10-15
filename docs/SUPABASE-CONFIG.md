@@ -22,7 +22,9 @@ As migrations foram executadas em ordem no SQL Editor do projeto:
 7. 20260921000700_weekly_content_scheduler.sql
 8. 20260921000800_sales_goals.sql
 9. 20260925000900_vh_imports_catalog.sql
-10. supabase/seed.sql
+10. 20260926001000_vh_fixed_catalog.sql
+11. 20261015001100_vh_catalog_quick_add.sql
+12. supabase/seed.sql
 
 ## Dados iniciais
 

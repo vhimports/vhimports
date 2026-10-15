@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { money } from '../lib/format'
-import { vhCatalogAssets } from '../lib/vhCatalogAssets'
+import { vhCatalogAssets, vhCatalogAssetOptions } from '../lib/vhCatalogAssets'
 
 const blank = {
   sale_price: '',
@@ -11,6 +11,23 @@ const blank = {
   sort_order: '0',
 }
 
+const newBlank = {
+  name: '',
+  brand: '',
+  category: 'Lifestyle',
+  image_key: vhCatalogAssetOptions[0]?.key || '',
+  description: '',
+  sale_price: '',
+  promotional_price: '',
+  active: false,
+  featured: false,
+  sort_order: '0',
+}
+
+function slugify(value) {
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
 function currentPrice(product) {
   return Number(product.promotional_price || product.sale_price || 0)
 }
@@ -18,7 +35,9 @@ function currentPrice(product) {
 export function ProductsPage() {
   const [products, setProducts] = useState([])
   const [form, setForm] = useState(blank)
+  const [newForm, setNewForm] = useState(newBlank)
   const [editingProduct, setEditingProduct] = useState(null)
+  const [creating, setCreating] = useState(false)
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -54,6 +73,8 @@ export function ProductsPage() {
   }, [products, search])
 
   const publishedCount = products.filter((product) => product.active).length
+  const brandOptions = useMemo(() => [...new Set(['Adidas', 'Nike', 'Asics', 'New Balance', 'Puma', 'Fila', 'Mizuno', 'Reserva', 'Vans', ...products.map((product) => product.brand).filter(Boolean)])].sort(), [products])
+  const categoryOptions = useMemo(() => [...new Set(['Corrida', 'Lifestyle', 'Basquete', 'Treino', 'Casual', 'Skate', ...products.map((product) => product.category).filter(Boolean)])].sort(), [products])
 
   function update(event) {
     const { name, value, type, checked } = event.target
@@ -61,6 +82,7 @@ export function ProductsPage() {
   }
 
   function editProduct(product) {
+    setCreating(false)
     setEditingProduct(product)
     setForm({
       sale_price: product.sale_price == null ? '' : String(product.sale_price),
@@ -76,6 +98,61 @@ export function ProductsPage() {
   function closeForm() {
     setEditingProduct(null)
     setForm(blank)
+  }
+
+  function openCreate() {
+    setEditingProduct(null)
+    setNewForm({ ...newBlank, image_key: vhCatalogAssetOptions[0]?.key || '' })
+    setCreating(true)
+    setFeedback({ type: '', message: '' })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function closeCreate() {
+    setCreating(false)
+    setNewForm(newBlank)
+  }
+
+  function updateNew(event) {
+    const { name, value, type, checked } = event.target
+    setNewForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
+  }
+
+  async function saveNew(event) {
+    event.preventDefault()
+    setSaving(true)
+    setFeedback({ type: '', message: '' })
+    try {
+      const salePrice = Number(newForm.sale_price)
+      const promotionalPrice = newForm.promotional_price === '' ? null : Number(newForm.promotional_price)
+      const sortOrder = Number(newForm.sort_order || 0)
+      const slug = `${slugify(newForm.brand)}-${slugify(newForm.name)}`
+      if (!slug || !newForm.image_key || !Number.isFinite(salePrice) || salePrice < 0 || !Number.isFinite(sortOrder) || sortOrder < 0) {
+        throw new Error('Informe nome, marca, foto fixa, preço normal e ordem válidos.')
+      }
+      const { error } = await supabase.rpc('create_vh_catalog_product', {
+        p_slug: slug,
+        p_name: newForm.name.trim(),
+        p_brand: newForm.brand.trim(),
+        p_category: newForm.category.trim(),
+        p_image_key: newForm.image_key,
+        p_description: newForm.description.trim(),
+        p_sale_price: salePrice,
+        p_promotional_price: promotionalPrice,
+        p_active: Boolean(newForm.active),
+        p_featured: Boolean(newForm.featured),
+        p_sort_order: sortOrder,
+        p_request_id: crypto.randomUUID(),
+      })
+      if (error) throw error
+      closeCreate()
+      setFeedback({ type: 'success', message: 'Novo modelo cadastrado e pronto para a vitrine.' })
+      await load()
+    } catch (error) {
+      setFeedback({ type: 'error', message: error.message || 'Não foi possível cadastrar o modelo.' })
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function save(event) {
@@ -115,10 +192,29 @@ export function ProductsPage() {
       <div>
         <span className="eyebrow">Catálogo fixo</span>
         <h1>Produtos e preços</h1>
-        <p>As fotos são fixas no projeto. Aqui o master controla os valores e a publicação na vitrine.</p>
-      </div>
+        <p>Cadastre modelos usando fotos fixas e controle preço, promoção e publicação na vitrine.</p>
+      </div><button className="primary-button page-action" type="button" onClick={openCreate}>＋ Novo modelo</button>
     </div>
     {feedback.message && <div className={`alert ${feedback.type === 'error' ? 'error' : 'success'} inline-alert`} role="alert"><strong>{feedback.type === 'error' ? 'Atenção' : 'Tudo certo'}</strong><span>{feedback.message}</span></div>}
+
+    {creating && <form className="panel form-panel quick-product-form" onSubmit={saveNew}>
+      <div className="panel-heading"><div><span className="eyebrow">Cadastro rápido</span><h2>Novo modelo</h2><p>Escolha uma foto que já esteja versionada no projeto. O identificador será criado automaticamente pela marca e pelo nome.</p></div><button type="button" className="secondary-button" onClick={closeCreate}>Cancelar</button></div>
+      <div className="form-grid">
+        <label>Nome do modelo<input name="name" required value={newForm.name} onChange={updateNew} placeholder="Ex.: Campus 00s" /></label>
+        <label>Marca<input name="brand" list="vh-brand-options" required value={newForm.brand} onChange={updateNew} placeholder="Ex.: Adidas" /></label>
+        <label>Categoria<input name="category" list="vh-category-options" required value={newForm.category} onChange={updateNew} placeholder="Ex.: Lifestyle" /></label>
+        <label>Foto fixa<select name="image_key" required value={newForm.image_key} onChange={updateNew}>{vhCatalogAssetOptions.map((asset) => <option key={asset.key} value={asset.key}>{asset.key}</option>)}</select></label>
+        <label>Preço normal (de)<input type="number" name="sale_price" min="0" step="0.01" required value={newForm.sale_price} onChange={updateNew} placeholder="0,00" /></label>
+        <label>Preço promocional (por)<input type="number" name="promotional_price" min="0" step="0.01" value={newForm.promotional_price} onChange={updateNew} placeholder="Opcional" /></label>
+        <label>Ordem na vitrine<input type="number" name="sort_order" min="0" step="1" value={newForm.sort_order} onChange={updateNew} /></label>
+        <label className="checkbox-label"><input type="checkbox" name="active" checked={newForm.active} onChange={updateNew} /> Publicar na vitrine</label>
+        <label className="checkbox-label"><input type="checkbox" name="featured" checked={newForm.featured} onChange={updateNew} /> Destacar modelo</label>
+      </div>
+      <label className="wide-field">Descrição<textarea name="description" rows="3" value={newForm.description} onChange={updateNew} placeholder="Informação curta para a página do produto (opcional)" /></label>
+      <datalist id="vh-brand-options">{brandOptions.map((brand) => <option key={brand} value={brand} />)}</datalist><datalist id="vh-category-options">{categoryOptions.map((category) => <option key={category} value={category} />)}</datalist>
+      <p className="field-help">Para aparecer no site, informe o preço normal e marque “Publicar na vitrine”. Se preencher o promocional, o preço normal será exibido como valor anterior.</p>
+      <div className="form-actions"><button className="primary-button" disabled={saving}>{saving ? 'Cadastrando…' : 'Cadastrar modelo'}</button></div>
+    </form>}
 
     <section className="metric-grid profit-metrics">
       <article className="metric-card gold"><div className="metric-top"><span>Modelos cadastrados</span><i>◇</i></div><strong>{loading ? '—' : products.length}</strong><small>Fotos fixas disponíveis no painel</small></article>
