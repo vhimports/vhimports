@@ -40,6 +40,7 @@ await db.exec(await readFile(new URL('../supabase/migrations/20260921000800_sale
 await db.exec(await readFile(new URL('../supabase/migrations/20260925000900_vh_imports_catalog.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20260926001000_vh_fixed_catalog.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20261015001100_vh_catalog_quick_add.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../supabase/migrations/20261117000100_vh_catalog_uploads_sections_archive.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/seed.sql',import.meta.url),'utf8'));
 await db.exec(`insert into private.master_access(slot,email,user_id) values(1,'master@example.test','${master}');`);
 const account = (await db.query('select id from public.contas_financeiras limit 1')).rows[0].id;
@@ -84,15 +85,51 @@ test('fixed VH catalog is master-readable and price changes use the audited RPC'
 test('master can add a fixed-photo catalog model and promotion while non-master is denied',()=>tx(async()=>{
   await asUser();
   const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
-  const result = (await db.query("select (public.create_vh_catalog_product($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)).*", [
-    'test-adidas-campus-00s', 'Campus 00s teste', 'Adidas', 'Lifestyle', 'catalog_nike-01-hi', 'Modelo criado no teste', 899.90, 799.90, true, false, 999, requestId,
+  const result = (await db.query("select (public.create_vh_catalog_product($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)).*", [
+    'test-adidas-campus-00s', 'Campus 00s teste', 'Adidas', 'Lifestyle', 'catalog_nike-01-hi', null, 'Modelo criado no teste', 899.90, 799.90, true, false, 999, requestId,
   ])).rows[0];
   assert.equal(result.brand, 'Adidas');
   assert.equal(result.sale_price, '899.90');
   assert.equal(result.promotional_price, '799.90');
   assert.equal(result.active, true);
   await db.exec('reset role'); await asUser(other);
-  await denied("select public.create_vh_catalog_product('test-adidas-campus-00s-2','Outro','Adidas','Lifestyle','catalog_nike-01-hi','',100,null,false,false,100,gen_random_uuid())");
+  await denied("select public.create_vh_catalog_product('test-adidas-campus-00s-2','Outro','Adidas','Lifestyle','catalog_nike-01-hi',null,'',100,null,false,false,100,gen_random_uuid())");
+}));
+test('master can upload a new photo instead of choosing a fixed one, and a model without a photo is rejected',()=>tx(async()=>{
+  await asUser();
+  const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const result = (await db.query("select (public.create_vh_catalog_product($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)).*", [
+    'test-vh-upload', 'Modelo com upload', 'VH Exclusivo', 'Lifestyle', null, 'uploads/test-vh-upload-123.jpg', 'Foto enviada pelo painel', 499.90, null, true, false, 50, requestId,
+  ])).rows[0];
+  assert.equal(result.image_key, null);
+  assert.equal(result.image_path, 'uploads/test-vh-upload-123.jpg');
+  await denied("select public.create_vh_catalog_product('test-sem-foto','Sem foto','Marca','Lifestyle',null,null,'',100,null,false,false,100,gen_random_uuid())");
+}));
+test('master can swap a catalog model photo between fixed asset and upload',()=>tx(async()=>{
+  await asUser();
+  const product = (await db.query("select * from public.vh_catalogo_produtos order by sort_order limit 1")).rows[0];
+  const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const result = (await db.query("select (public.update_vh_catalog_photo($1,null,$2,$3)).*", [product.id, 'uploads/swap-test.jpg', requestId])).rows[0];
+  assert.equal(result.image_key, null);
+  assert.equal(result.image_path, 'uploads/swap-test.jpg');
+  await db.exec('reset role'); await asUser(other);
+  await denied("select public.update_vh_catalog_photo($1,'catalog_nike-01-hi',null,gen_random_uuid())", [product.id]);
+}));
+test('archiving a catalog model unpublishes it and it can be restored as a draft',()=>tx(async()=>{
+  await asUser();
+  const product = (await db.query("select * from public.vh_catalogo_produtos order by sort_order limit 1")).rows[0];
+  await db.exec('reset role'); await asUser(other);
+  await denied('select public.archive_vh_catalog_product($1,gen_random_uuid())', [product.id]);
+  await db.exec('reset role'); await asUser();
+  const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const archived = (await db.query('select (public.archive_vh_catalog_product($1,$2)).*', [product.id, requestId])).rows[0];
+  assert.equal(archived.active, false);
+  assert.notEqual(archived.archived_at, null);
+  await denied('select public.archive_vh_catalog_product($1,gen_random_uuid())', [product.id]);
+  const restoreId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const restored = (await db.query('select (public.restore_vh_catalog_product($1,$2)).*', [product.id, restoreId])).rows[0];
+  assert.equal(restored.archived_at, null);
+  assert.equal(restored.active, false);
 }));
 test('non-master fails closed while master can operate without MFA',()=>tx(async()=>{
   await asUser(master,'aal1');
@@ -347,6 +384,35 @@ test('weekly content scheduler reports shortage without repeating available phot
   const result=(await db.query("select public.generate_weekly_content_schedule('2026-02-02',gen_random_uuid()) data")).rows[0].data;
   assert.equal(result.created,3); assert.equal(result.missing,32);
   assert.equal(Number((await db.query("select count(distinct image_path) n from public.publicacoes_conteudo where scheduled_for >= '2026-02-02'::date and scheduled_for < '2026-02-09'::date")).rows[0].n),3);
+}));
+
+test('home sections (vitrine tiles) can be created, edited, archived and restored by master only',()=>tx(async()=>{
+  await asUser();
+  const seeded = (await db.query('select count(*)::int n from public.vh_catalogo_secoes')).rows[0].n;
+  assert.equal(seeded, 4);
+  await db.exec('reset role'); await asUser(other);
+  await denied("select public.create_vh_catalog_section('Skate','Pranchas e rolês.','orange',500,true,gen_random_uuid())");
+  await db.exec('reset role'); await asUser();
+  const requestId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const created = (await db.query("select (public.create_vh_catalog_section($1,$2,$3,$4,$5,$6)).*", [
+    'Skate', 'Pranchas e rolês.', 'orange', 500, true, requestId,
+  ])).rows[0];
+  assert.equal(created.title, 'Skate');
+  assert.equal(created.active, true);
+  await denied("select public.create_vh_catalog_section('Skate 2','Repetido','xyz',600,true,gen_random_uuid())");
+  const updateId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const updated = (await db.query("select (public.update_vh_catalog_section($1,$2,$3,$4,$5,$6,$7)).*", [
+    created.id, 'Skate & Pista', 'Pranchas, muros e a próxima aterrissagem.', 'blue', 510, true, updateId,
+  ])).rows[0];
+  assert.equal(updated.title, 'Skate & Pista');
+  assert.equal(updated.tone, 'blue');
+  const archiveId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const archived = (await db.query('select (public.archive_vh_catalog_section($1,$2)).*', [created.id, archiveId])).rows[0];
+  assert.equal(archived.active, false);
+  assert.notEqual(archived.archived_at, null);
+  const restoreId = (await db.query('select gen_random_uuid() id')).rows[0].id;
+  const restored = (await db.query('select (public.restore_vh_catalog_section($1,$2)).*', [created.id, restoreId])).rows[0];
+  assert.equal(restored.archived_at, null);
 }));
 
 after(()=>db.close());

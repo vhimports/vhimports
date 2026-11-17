@@ -66,7 +66,40 @@ Aplicar, em ordem:
 9. `20260925000900_vh_imports_catalog.sql`
 10. `20260926001000_vh_fixed_catalog.sql`
 11. `20261015001100_vh_catalog_quick_add.sql`
-12. `supabase/seed.sql`
+12. `20261117000100_vh_catalog_uploads_sections_archive.sql`
+13. `supabase/seed.sql`
+
+## Cadastro completo pelo proprietário — upload de foto, seções e arquivamento
+
+Atualização de 17/11/2026, para que o proprietário consiga operar o catálogo e a home
+sozinho, sem depender de alteração de código:
+
+- **Upload de foto**: ao cadastrar um modelo novo em `Produtos e preços`, o master pode
+  escolher entre uma foto já versionada no projeto (`image_key`) ou enviar uma foto
+  própria (`image_path`), que sobe para o bucket privado `product-images` via
+  `supabase.storage`. A RPC `create_vh_catalog_product` exige pelo menos uma das duas.
+  A foto de um modelo já cadastrado pode ser trocada a qualquer momento pela RPC
+  `update_vh_catalog_photo`, pelo mesmo fluxo (fixa ou upload).
+- **Seções editáveis da vitrine**: os blocos do bloco "Para onde você vai?" da home
+  (antes fixos em `categoryTiles`) agora vêm da tabela `vh_catalogo_secoes` e são
+  geridos na nova tela `Seções da vitrine` do painel (criar, editar, reordenar,
+  arquivar e restaurar). As RPCs `create_vh_catalog_section`,
+  `update_vh_catalog_section`, `archive_vh_catalog_section` e
+  `restore_vh_catalog_section` seguem o mesmo padrão de auditoria e checagem de
+  master usado no restante do catálogo. A vitrine pública busca essas seções pela
+  mesma Function `public-catalog`; se a consulta falhar ou não houver seção ativa,
+  o frontend usa os quatro blocos originais como fallback.
+- **Arquivar em vez de excluir**: não existe exclusão definitiva de modelo. A RPC
+  `archive_vh_catalog_product` despublica o modelo (`active=false`) e marca
+  `archived_at`; `restore_vh_catalog_product` reverte, voltando como rascunho para
+  o master revisar preço/publicação antes de reativar. O histórico e a auditoria em
+  `logs_auditoria` continuam intactos. O mesmo padrão existe para seções.
+- A Edge Function `public-catalog` passou a gerar uma URL assinada (1 hora) para
+  fotos enviadas por upload e a retornar as seções ativas junto dos produtos,
+  mantendo o bucket de imagens privado.
+- Regra de negócio preservada: tudo que o proprietário cadastra, publica ou altera
+  no painel passa pelo banco (RPCs auditadas) e aparece automaticamente na vitrine
+  pública na próxima consulta à Function — não é necessário novo deploy do site.
 
 ## Estado desta versão
 

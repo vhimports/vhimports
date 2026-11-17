@@ -45,12 +45,21 @@ Deno.serve(async (request) => {
       auth: { autoRefreshToken: false, persistSession: false },
     })
 
-    const productsResult = await admin.from('vh_catalogo_produtos')
-      .select('id,slug,name,brand,category,image_key,description,sale_price,promotional_price,featured,sort_order')
-      .eq('active', true)
-      .gt('sale_price', 0)
-      .order('sort_order')
-      .order('name')
+    const [productsResult, sectionsResult] = await Promise.all([
+      admin.from('vh_catalogo_produtos')
+        .select('id,slug,name,brand,category,image_key,image_path,description,sale_price,promotional_price,featured,sort_order')
+        .eq('active', true)
+        .is('archived_at', null)
+        .gt('sale_price', 0)
+        .order('sort_order')
+        .order('name'),
+      admin.from('vh_catalogo_secoes')
+        .select('id,title,detail,tone,sort_order')
+        .eq('active', true)
+        .is('archived_at', null)
+        .order('sort_order')
+        .order('title'),
+    ])
 
     if (productsResult.error) {
       console.error('Falha ao consultar o catálogo público.')
@@ -58,6 +67,17 @@ Deno.serve(async (request) => {
     }
 
     const products = productsResult.data || []
+    // Fotos enviadas pelo painel ficam num bucket privado; a Edge Function
+    // gera uma URL assinada de curta duração em vez de expor o Storage.
+    const signedUrlByPath = new Map<string, string>()
+    const pathsToSign = [...new Set(products.map((product) => product.image_path).filter(Boolean))]
+    if (pathsToSign.length > 0) {
+      const signedResult = await admin.storage.from('product-images').createSignedUrls(pathsToSign, 3600)
+      for (const entry of signedResult.data || []) {
+        if (entry.path && entry.signedUrl) signedUrlByPath.set(entry.path, entry.signedUrl)
+      }
+    }
+
     const safeProducts = products.map((product) => {
       const sale = Number(product.sale_price || 0)
       const promotional = product.promotional_price == null ? null : Number(product.promotional_price)
@@ -69,13 +89,20 @@ Deno.serve(async (request) => {
         brand: product.brand,
         category: product.category,
         imageKey: product.image_key,
+        imageUrl: product.image_path ? signedUrlByPath.get(product.image_path) || null : null,
         price: promotional != null && promotional > 0 ? promotional : sale,
         oldPrice: promotional != null && promotional > 0 && promotional < sale ? sale : null,
         featured: Boolean(product.featured),
       }
     })
 
-    return json(request, { products: safeProducts, generatedAt: new Date().toISOString() })
+    const sections = (sectionsResult.data || []).map((section) => ({
+      title: section.title,
+      detail: section.detail,
+      tone: section.tone,
+    }))
+
+    return json(request, { products: safeProducts, sections, generatedAt: new Date().toISOString() })
   } catch {
     console.error('Erro inesperado no catálogo público.')
     return json(request, { error: 'Catálogo temporariamente indisponível.' }, 503)

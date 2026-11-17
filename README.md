@@ -30,6 +30,8 @@ As migrations em `supabase/migrations` devem ser aplicadas em ordem no projeto S
 
 A migration `20260925000900_vh_imports_catalog.sql` adiciona marcas, categorias de tênis e grade de numerações sem remover as regras transacionais da Finesse.
 
+A migration `20261117000100_vh_catalog_uploads_sections_archive.sql` permite ao proprietário cadastrar um modelo enviando a própria foto (upload direto para o bucket `product-images`, sem depender de uma foto já versionada no código), arquivar/restaurar modelos sem exclusão definitiva e editar os blocos de categoria da home (seções) pelo painel, sem alterar código.
+
 ### Projeto configurado
 
 - Project ref: `zbmxehzprydojjfdwupp`.
