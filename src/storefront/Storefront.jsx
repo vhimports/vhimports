@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import vhLogo from '../assets/vh-logo-metal.jpg'
+import igOnCloudBlack from '../assets/instagram/ig-on-cloud-black.jpg'
+import igNikeAf1White from '../assets/instagram/ig-nike-af1-white.jpg'
+import igNikeAf1Box from '../assets/instagram/ig-nike-af1-box.jpg'
+import igOnCloudGrey from '../assets/instagram/ig-on-cloud-grey.jpg'
+import igNewBalanceBlue from '../assets/instagram/ig-new-balance-blue.jpg'
+import igNewBalanceWhite from '../assets/instagram/ig-new-balance-white.jpg'
 import { vhCatalogAssets } from '../lib/vhCatalogAssets'
 import { driveCatalog } from '../lib/driveCatalog'
 
@@ -44,12 +50,12 @@ function catalogDisplayName(value) {
 }
 
 const familyTiles = [
-  { label: 'VH no corre', image: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&w=800&q=85' },
-  { label: 'VH na rua', image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=800&q=85' },
-  { label: 'VH no detalhe', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=800&q=85' },
-  { label: 'VH no movimento', image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=800&q=85' },
-  { label: 'VH no seu ritmo', image: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=85' },
-  { label: 'VH em você', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=85' },
+  { label: 'VH no corre', image: igOnCloudBlack },
+  { label: 'VH na rua', image: igNikeAf1White },
+  { label: 'VH no detalhe', image: igNikeAf1Box },
+  { label: 'VH no movimento', image: igOnCloudGrey },
+  { label: 'VH no seu ritmo', image: igNewBalanceBlue },
+  { label: 'VH em você', image: igNewBalanceWhite },
 ]
 
 const categoryTiles = [
